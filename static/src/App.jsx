@@ -13,6 +13,7 @@ class IssueFilter extends React.Component{
 class IssueRow extends React.Component{
   render(){
       const issue = this.props.issue;
+      console.log("IssueRow ");
       return (
         <tr>
             <td>{issue.id}</td>
@@ -71,13 +72,31 @@ title: 'Missing bottom border on panel',
 },
 ];
 class IssueList extends React.Component{
+    constructor(){
+      super();
+      this.state = {issues:issues}
+      setTimeout(this.createTestIssue.bind(this), 2000);
+    }
+
+    createIssue(newIssue){
+       const newIssues = this.state.issues.slice();
+       newIssue.id = this.state.issues.length + 1;
+       newIssues.push(newIssue);
+       this.setState({issues: newIssues});
+    }
+
+    createTestIssue(){
+      this.createIssue({
+        status: 'New', Owner: 'Pieta', created: new Date(), title: 'Completion date should be optional',
+      });
+    }
     render(){
       return (
         <div>
           <h1> Issue Tracker </h1>
           <IssueFilter />
           <hr />
-          <IssueTable issues={issues} />
+          <IssueTable issues={this.state.issues} />
           <hr />
           <IssueAdd />
          </div>
