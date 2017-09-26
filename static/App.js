@@ -68,7 +68,7 @@ var IssueRow = function (_React$Component2) {
         React.createElement(
           'td',
           null,
-          issue.created.toDateString()
+          issue.created
         ),
         React.createElement(
           'td',
@@ -78,7 +78,7 @@ var IssueRow = function (_React$Component2) {
         React.createElement(
           'td',
           null,
-          issue.completionDate ? issue.completionDate.toDateString() : ''
+          issue.completionDate ? issue.completionDate : ''
         ),
         React.createElement(
           'td',
@@ -230,26 +230,61 @@ var IssueList = function (_React$Component5) {
   }
 
   _createClass(IssueList, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      this.setState({ issues: issues });
-    }
-  }, {
     key: 'loadData',
     value: function loadData() {
       var _this6 = this;
 
-      setTimeout(function () {
-        _this6.setState({ issues: issues });
-      }, 500);
+      fetch('/api/issues').then(function (response) {
+        response.json();
+      }).then(function (data) {
+        console.log("Total count of records ");
+        data.records.foreach(function (issue) {
+          issue.created = new Date(issue.created);
+          if (issue.completionDate) {
+            issue.completionDate = new Date(issue.completionDate);
+          }
+        });
+        _this6.setState({ issues: data.records });
+      }).catch(function (err) {
+        console.log(err);
+      });
     }
   }, {
     key: 'createIssue',
     value: function createIssue(newIssue) {
-      var newIssues = this.state.issues.slice();
-      newIssue.id = this.state.issues.length + 1;
-      newIssues.push(newIssue);
-      this.setState({ issues: newIssues });
+      var _this7 = this;
+
+      var updatedIssue = {
+        "id": this.state.id,
+        "status": this.state.status,
+        "owner": this.state.owner,
+        "effort": this.state.effort,
+        "created": this.state.created,
+        "completionDate": this.state.completionDate,
+        "title": this.state.title
+      };
+      fetch('/api/issues', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newIssue)
+      }).then(function (response) {
+        if (response.ok) {
+          response.json().then(function (newIssue) {
+            newIssue.Created = new Date(newIssue.created);
+            if (newIssue.completionDate) {
+              newIssue.completionDate = new Date(newIssue.completionDate);
+            }
+            var newIssues = _this7.state.issues.concat(newIssue);
+            _this7.setState({ issues: newIssues });
+          });
+        } else {
+          response.json().then(function (error) {
+            alert("Failed to add issue: " + error.message);
+          });
+        }
+      }).catch(function (err) {
+        alert("Error in sending data to server: " + err.message);
+      });
     }
   }, {
     key: 'render',
