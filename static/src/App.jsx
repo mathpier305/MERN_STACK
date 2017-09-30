@@ -16,7 +16,7 @@ class IssueRow extends React.Component{
       console.log("IssueRow ");
       return (
         <tr>
-            <td>{issue.id}</td>
+            <td>{issue._id}</td>
             <td>{issue.status}</td>
             <td>{issue.owner}</td>
             <td>{issue.created}</td>
@@ -30,7 +30,7 @@ class IssueRow extends React.Component{
 
 class IssueTable extends React.Component{
   render(){
-    const issueRows = this.props.issues.map(issue => <IssueRow key={issue.id} issue={issue} />)
+    const issueRows = this.props.issues.map(issue => <IssueRow key={issue._id} issue={issue} />)
     return (
       <table >
        <thead>
@@ -92,10 +92,11 @@ class IssueList extends React.Component{
 
 
     loadData(){
-
+      console.log("****client****");
       fetch('/api/issues').then(response=>{
-          response.json()
-          }).then(data => {
+
+          if(response.ok){
+         response.json().then(data => {
           console.log("Total count of records ");
          data.records.foreach(
         issue=>{
@@ -105,7 +106,14 @@ class IssueList extends React.Component{
           }
         })
           this.setState({issues: data.records});
+        })
+        }else{
+        response.json().then(error=>{
+        alert("Failed to fetch issues: "+error.message);
+        });
+        }
         }).catch(err=>{
+        alert("Error in fetching data from server: ", err);
           console.log(err);
         });
 
@@ -113,7 +121,7 @@ class IssueList extends React.Component{
 
     createIssue(newIssue){
     const updatedIssue = {
-      "id": this.state.id,
+      "id": this.state._id,
       "status": this.state.status,
       "owner": this.state.owner,
       "effort": this.state.effort,
@@ -134,7 +142,7 @@ class IssueList extends React.Component{
               }
               const newIssues = this.state.issues.concat(newIssue);
               this.setState({issues: newIssues});
-
+              console.log("**** my client****")
           });
           }else{
             response.json().then(error => {

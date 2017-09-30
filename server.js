@@ -5,6 +5,17 @@ const bodyParser = require('body-parser');
 app.use(express.static('static'));
 app.use(bodyParser.json());
 
+const MongoClient = require('mongodb').MongoClient;
+let db;
+MongoClient.connect('mongodb://localhost/issuetracker').then(connection=>{
+ db = connection;
+
+ app.listen(3000, ()=>{
+   console.log('App started on port 3000');
+ });
+}).catch(error=>{
+  console.log('ERROR', error);
+});
 const validIssueStatus = {
   New: true,
   Open: true,
@@ -15,7 +26,6 @@ const validIssueStatus = {
 };
 
 const issueFieldType= {
-  id: 'required',
   status: 'required',
   owner: 'required',
   effort: 'optional',
@@ -23,19 +33,6 @@ const issueFieldType= {
   completionDate: 'optional',
   title: 'required',
 };
-const issues = [
-{
-  id: 1, status: 'Open', owner: 'Ravan',
-  created: new Date('2016-08-15'), effort: 5, completionDate : undefined,
-  title: 'Error in console when clicking add',
-
-},
-{
-id: 2, status: 'Assigned', owner: 'Eddie',
-created: new Date('2016-08-16'), effort: 14, completionDate : new Date('2016-08-30'),
-title: 'Missing bottom border on panel',
-},
-];
 
 function validateIssue(issue){
   for(const field in issueFieldType){
@@ -53,14 +50,25 @@ function validateIssue(issue){
 }
 
 app.get('/api/issues', (req, res)=>{
-  const metadata = {total_count: issues.length };
-  console.log("printing a log statement before sending the response");
-  res.json({_metadata: metadata, records:issues} );
+  // const metadata = {total_count: issues.length };
+  // console.log("printing a log statement before sending the response");
+  // res.json({_metadata: metadata, records:issues} );
+
+  db.collection('issues').find().toArray().then(issues =>{
+    const metadata = {total_count: issues.length};
+    res.json ({ metadata: metadata, records: issues});
+  }).catch(error=>{
+    console.log(error);
+    res.status(500).json({message: 'Internal Server Error'});
+  });
+
+
 });
 
 app.post('/api/issues', (req, res)=>{
+  console.log("******** hello ********")
   const newIssue = req.body;
-  newIssue.id = issues.length +1;
+  //newIssue.id = issues.length +1;
   newIssue.created = new Date();
   if(!newIssue.status){
     newIssue.status = 'New';
@@ -68,15 +76,27 @@ app.post('/api/issues', (req, res)=>{
 
   const err = validateIssue(newIssue);
     if(err){
+      console.log("******** error ********")
       res.status(422).json({message: `Invalid request: ${err}`});
       return;
     }
 
-  issues.push(newIssue);
+    db.collection('issues').insertOne(newIssue).then(result=>{
+      console.log("******** hello1 ********")
+      db.collection('issues').find({_id: result.insertedId}).limit(1).next().
+      then(newIssue=>{
+        console.log("******** hello2 ********")
+        res.json(newIssue);
+      }).catch(error=>{
+        console.log(error);
+        res.status(500).json({message: `Internal Server error : ${error}`});
+      });
+    });
+  //issues.push(newIssue);
 
-  res.json(newIssue);
+  //res.json(newIssue);
 });
 
-app.listen(3000, ()=>{
-  console.log('App started on port 3000');
-});
+// app.listen(3000, ()=>{
+//   console.log('App started on port 3000');
+// });
