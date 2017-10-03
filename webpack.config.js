@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 module.exports={
   entry:{
-    app:  __dirname+"/static/src/App.jsx",
+    app:  ['./static/src/App.jsx'],
     vendor:['react', 'react-dom', 'whatwg-fetch'],
   },
   output:{
@@ -11,6 +11,7 @@ module.exports={
   plugins:[
     new webpack.optimize.CommonsChunkPlugin({name: 'vendor', filename: 'vendor.bundle.js' })
   ],
+  devtool: 'source-map',
   devServer:{
     port: 8000,
     contentBase: 'static',
