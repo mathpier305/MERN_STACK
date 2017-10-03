@@ -55,7 +55,7 @@ export default class IssueList extends React.Component{
 
 
     loadData(){
-      console.log("****load data****");
+      console.log("****load data2****");
       fetch('/api/issues').then(response=>{
 
           if(response.ok){

@@ -11,6 +11,15 @@ module.exports={
   plugins:[
     new webpack.optimize.CommonsChunkPlugin({name: 'vendor', filename: 'vendor.bundle.js' })
   ],
+  devServer:{
+    port: 8000,
+    contentBase: 'static',
+    proxy:{
+      '/api/*':{
+        target: 'http://localhost:3000'
+      }
+    }
+  },
   module:{
     loaders: [
       {

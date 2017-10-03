@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon -w server.js server/server.js",
     "compile": "webpack",
-    "watch": "webpack --watch"
+    "watch": "webpack-dev-server --hot --inline"
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +28,7 @@
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "webpack": "^3.6.0",
+    "webpack-dev-server": "^2.9.1",
     "whatwg-fetch": "^2.0.3"
   }
 }
