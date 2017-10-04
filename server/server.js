@@ -1,12 +1,16 @@
-const express = require('express');
+import express from 'express';
+import bodyParser from 'body-parser';
+import {MongoClient} from 'mongodb';
+import Issue from './issue.js';
+import 'babel-polyfill';
+import SourceMapSupport from 'source-map-support';
+SourceMapSupport.install();
+
 
 const app = express();
-const bodyParser = require('body-parser');
 app.use(express.static('static'));
 app.use(bodyParser.json());
 
-const MongoClient = require('mongodb').MongoClient;
-const Issue = require('./issue.js');
 let db;
 MongoClient.connect('mongodb://localhost/issuetracker').then(connection=>{
  db = connection;
@@ -17,6 +21,7 @@ MongoClient.connect('mongodb://localhost/issuetracker').then(connection=>{
 }).catch(error=>{
   console.log('ERROR', error);
 });
+
 
 if(process.env.NODE_ENV !== 'production'){
   const webpack = require('webpack');
@@ -35,9 +40,6 @@ app.use(webpackHotMiddleware(bundler, {log: console.log}));
 
 
 app.get('/api/issues', (req, res)=>{
-  // const metadata = {total_count: issues.length };
-  // console.log("printing a log statement before sending the response");
-  // res.json({_metadata: metadata, records:issues} );
 
   db.collection('issues').find().toArray().then(issues =>{
     const metadata = {total_count: issues.length};
