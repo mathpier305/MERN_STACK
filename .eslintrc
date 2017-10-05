@@ -1,0 +1,6 @@
+{
+  "extends": "airbnb",
+  "rules":["off"],
+  "no-param-reassign":["error",{"props":"false"}],
+
+},
