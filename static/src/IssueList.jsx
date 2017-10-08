@@ -1,5 +1,6 @@
 import React from 'react';
 import 'whatwg-fetch';
+import {Link} from 'react-router'
 
 import IssueAdd from './IssueAdd.jsx';
 import IssueFilter from './IssueFilter.jsx';
@@ -11,7 +12,7 @@ class IssueRow extends React.Component{
       console.log("IssueRow ");
       return (
         <tr>
-            <td>{issue._id}</td>
+            <td><Link to={`/issues/${props.issue._id}`}>{props.issue._id.substr(-4)}</Link></td>
             <td>{issue.status}</td>
             <td>{issue.owner}</td>
             <td>{issue.created}</td>
