@@ -1,49 +1,48 @@
 import React from 'react';
 import 'whatwg-fetch';
+import PropTypes from 'prop-types';
 import {Link} from 'react-router'
 
 import IssueAdd from './IssueAdd.jsx';
 import IssueFilter from './IssueFilter.jsx';
 
+const IssueRow = (props) => (
+<tr>
+    <td><Link to={`/issues/${props.issue._id}`}>{props.issue._id.substr(-4)}</Link></td>
+    <td>{props.issue.status}</td>
+    <td>{props.issue.owner}</td>
+    <td>{props.issue.created}</td>
+    <td>{props.issue.effort}</td>
+    <td>{props.issue.completionDate? issue.completionDate : ''}</td>
+    <td>{props.issue.title}</td>
+</tr>
+);
 
-class IssueRow extends React.Component{
-  render(){
-      const issue = this.props.issue;
-      console.log("IssueRow ");
-      return (
-        <tr>
-            <td><Link to={`/issues/${props.issue._id}`}>{props.issue._id.substr(-4)}</Link></td>
-            <td>{issue.status}</td>
-            <td>{issue.owner}</td>
-            <td>{issue.created}</td>
-            <td>{issue.effort}</td>
-            <td>{issue.completionDate? issue.completionDate : ''}</td>
-            <td>{issue.title}</td>
-        </tr>
-      )
-  }
-}
 
-class IssueTable extends React.Component{
-  render(){
-    const issueRows = this.props.issues.map(issue => <IssueRow key={issue._id} issue={issue} />)
-    return (
-      <table >
-       <thead>
-        <tr>
-         <th>Id</th>
-         <th>Title</th>
-         <th>Owner</th>
-         <th>Created</th>
-         <th>Effort</th>
-         <th>Completion Date</th>
-         <th>Title</th>
-        </tr>
-      </thead>
-      <tbody>{issueRows}</tbody>
-     </table>
-    )
-  }
+IssueRow.propTypes = {
+  issue: PropTypes.object.isRequired,
+};
+
+function IssueTable (props){
+  const issueRows = props.issues.map(issue => <IssueRow key={issue._id} issue={issue} />);
+
+  return (
+    <table  className="bordered-table">
+     <thead>
+      <tr>
+       <th>Id</th>
+       <th>Title</th>
+       <th>Owner</th>
+       <th>Created</th>
+       <th>Effort</th>
+       <th>Completion Date</th>
+       <th>Title</th>
+      </tr>
+    </thead>
+    <tbody>{issueRows}</tbody>
+   </table>
+   );
+
 }
 
 
