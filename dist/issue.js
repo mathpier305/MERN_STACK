@@ -38,9 +38,8 @@ function validateIssue(issue) {
   });
 
   if (!validIssueStatus[issue.status]) {
-    errors.push(`${issue.status} is not a valid status.`);
+    errors.push(`${issue.status} is not a valid status`);
   }
-
   return errors.length ? errors.join('; ') : null;
 }
 

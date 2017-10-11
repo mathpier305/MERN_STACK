@@ -1,23 +1,27 @@
 import React from 'react';
 import 'whatwg-fetch';
 import PropTypes from 'prop-types';
-import {Link} from 'react-router'
+import {Link} from 'react-router-dom';
 
 import IssueAdd from './IssueAdd.jsx';
 import IssueFilter from './IssueFilter.jsx';
 
 const IssueRow = (props) => (
 <tr>
-    <td><Link to={`/issues/${props.issue._id}`}>{props.issue._id.substr(-4)}</Link></td>
-    <td>{props.issue.status}</td>
-    <td>{props.issue.owner}</td>
-    <td>{props.issue.created}</td>
-    <td>{props.issue.effort}</td>
-    <td>{props.issue.completionDate? issue.completionDate : ''}</td>
-    <td>{props.issue.title}</td>
+  <td><Link to={`/issues/${props.issue._id}`}>
+  {props.issue._id.substr(-4)}</Link></td>
+  <td>{props.issue.status}</td>
+  <td>{props.issue.owner}</td>
+  <td>{(props.issue.effort == null) ? '' : props.issue.effort}</td>
+  <td>{props.issue.created}</td>
+  <td>{(props.issue.completionDate == null) ? '' : issue.completionDate}</td>
+  <td>{props.issue.title}</td>
 </tr>
 );
+/*
 
+  <td><Link to={`/issues/${props.issue._id}`}>{props.issue._id.substr(-4)}</Link></td>
+*/
 
 IssueRow.propTypes = {
   issue: PropTypes.object.isRequired,
@@ -71,7 +75,7 @@ export default class IssueList extends React.Component{
           this.setState({issues: data.records});
         })
         }else{
-        response.json().then(error=>{
+        response.then(error=>{
         alert("Failed to fetch issues: "+error.message);
         });
         }
@@ -99,13 +103,15 @@ export default class IssueList extends React.Component{
         }).then(response =>{
         if(response.ok){
           response.json().then(newIssue=>{
+            console.log("**** creating new issue ****")
             newIssue.Created = new Date(newIssue.created);
             if(newIssue.completionDate){
               newIssue.completionDate = new Date(newIssue.completionDate);
-              }
-              const newIssues = this.state.issues.concat(newIssue);
-              this.setState({issues: newIssues});
-              console.log("**** my client****")
+            }
+            const newIssues = this.state.issues.concat(newIssue);
+            console.log(newIssues);
+            this.setState({issues: newIssues});
+            console.log("**** my client****")
           });
           }else{
             response.json().then(error => {
