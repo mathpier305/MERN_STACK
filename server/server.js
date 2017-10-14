@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import { MongoClient } from 'mongodb';
 import Issue from './issue.js';
 import 'babel-polyfill';
+import path from 'path';
 import SourceMapSupport from 'source-map-support';
 
 SourceMapSupport.install();
@@ -43,6 +44,10 @@ if (process.env.NODE_ENV !== 'production') {
 app.get('/api/issues', (req, res) => {
   const filter ={};
   if(req.query.status) filter.status = req.query.status;
+  if(req.query.effort_lte || req.query.effort_gte) filter.effort ={};
+  if(req.query.effort_lte) filter.effort.$lte = parseInt(req.query.effort_lte, 10);
+  if(req.query.effort_gte) filter.effort.$gte = parseInt(req.query.effort_gte, 10);
+
   db.collection('issues').find().toArray().then((issues) => {
     const metadata = { total_count: issues.length };
     res.json({ metadata, records: issues });
@@ -81,6 +86,10 @@ app.post('/api/issues', (req, res) => {
         console.log(error);
         res.status(500).json({ message: `Internal Server error : ${error}` });
       });
+  });
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve('static/index.html'));
   });
   // issues.push(newIssue);
 

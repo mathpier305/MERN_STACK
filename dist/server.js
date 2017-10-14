@@ -16,6 +16,10 @@ var _issue2 = _interopRequireDefault(_issue);
 
 require('babel-polyfill');
 
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
 var _sourceMapSupport = require('source-map-support');
 
 var _sourceMapSupport2 = _interopRequireDefault(_sourceMapSupport);
@@ -56,6 +60,10 @@ if (process.env.NODE_ENV !== 'production') {
 app.get('/api/issues', (req, res) => {
   const filter = {};
   if (req.query.status) filter.status = req.query.status;
+  if (req.query.effort_lte || req.query.effort_gte) filter.effort = {};
+  if (req.query.effort_lte) filter.effort.$lte = parseInt(req.query.effort_lte, 10);
+  if (req.query.effort_gte) filter.effort.$gte = parseInt(req.query.effort_gte, 10);
+
   db.collection('issues').find().toArray().then(issues => {
     const metadata = { total_count: issues.length };
     res.json({ metadata: metadata, records: issues });
@@ -91,6 +99,10 @@ app.post('/api/issues', (req, res) => {
       console.log(error);
       res.status(500).json({ message: `Internal Server error : ${error}` });
     });
+  });
+
+  app.get('*', (req, res) => {
+    res.sendFile(_path2.default.resolve('static/index.html'));
   });
   // issues.push(newIssue);
 

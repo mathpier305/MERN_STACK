@@ -40,7 +40,7 @@ const RoutedApp = () => (
 
     <Switch>
       <Route path="/issues/:id" component={IssueEdit}/>
-      <Route path="/issues" component={withRouter(IssueList)} />
+      <Route path="/issues" component={IssueList} />
       <Redirect exact from="/" to="/issues"/>
       <Route path="*" component={NoMatch} />
 
