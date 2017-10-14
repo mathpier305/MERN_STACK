@@ -64,7 +64,7 @@ app.get('/api/issues', (req, res) => {
   if (req.query.effort_lte) filter.effort.$lte = parseInt(req.query.effort_lte, 10);
   if (req.query.effort_gte) filter.effort.$gte = parseInt(req.query.effort_gte, 10);
 
-  db.collection('issues').find().toArray().then(issues => {
+  db.collection('issues').find(filter).toArray().then(issues => {
     const metadata = { total_count: issues.length };
     res.json({ metadata: metadata, records: issues });
     console.log("request");

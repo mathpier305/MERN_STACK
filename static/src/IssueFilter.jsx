@@ -24,7 +24,7 @@ export default class IssueFilter extends React.Component{
 
   clearFilter(e){
     e.preventDefault();
-    this.props.setFilter({status:'issues'});
+    this.props.setFilter({});
   }
 
   render(){
