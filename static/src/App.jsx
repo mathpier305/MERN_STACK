@@ -2,7 +2,7 @@ import 'babel-polyfill';
 import React from 'react';
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom';
-import {HashRouter as Router, Route, Switch, Redirect, hashHistory, withRouter} from 'react-router-dom';
+import {HashRouter as Router, Route, Switch, Redirect, browserHistory, withRouter} from 'react-router-dom';
 
 
 import IssueList from './IssueList.jsx';
@@ -35,7 +35,7 @@ App.propTypes = {
 
 
 const RoutedApp = () => (
-    <Router history={hashHistory} >
+    <Router history={browserHistory} >
     <App>
 
     <Switch>
