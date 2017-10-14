@@ -41,9 +41,12 @@ if (process.env.NODE_ENV !== 'production') {
 
 
 app.get('/api/issues', (req, res) => {
+  const filter ={};
+  if(req.query.status) filter.status = req.query.status;
   db.collection('issues').find().toArray().then((issues) => {
     const metadata = { total_count: issues.length };
     res.json({ metadata, records: issues });
+    console.log("request");
   })
     .catch((error) => {
       console.log(error);
