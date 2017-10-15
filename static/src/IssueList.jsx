@@ -79,9 +79,17 @@ class IssueList extends React.Component {
     console.log(prevProps);
     const oldQuery = prevProps.location.query;
     const newQuery = this.props.location.query;
+
     if (oldQuery === newQuery) {
       return;
     }
+
+    if(oldQuery.status == newQuery.status
+     && oldQuery.effort_gte === newQuery.effort_gte
+     && oldQuery.effort_lte === newQuery.effort_lte){
+      return;
+     }
+
     this.loadData();
   }
 
@@ -135,8 +143,9 @@ class IssueList extends React.Component {
   render() {
     return (
       <div>
-
-        <IssueFilter setFilter={this.setFilter} />
+      console.log(this.props.location);
+      <IssueFilter setFilter={this.setFilter}
+      initFilter={this.props.location.query}  />
         <hr />
         <IssueTable issues={this.state.issues} />
         <hr />
