@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 export default class IssueEdit extends React.Component { // eslint-disable-line
 constructor(props){
