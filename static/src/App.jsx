@@ -1,8 +1,8 @@
 import 'babel-polyfill';
 import React from 'react';
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
-import {HashRouter as Router, Route, Switch, Redirect, browserHistory, withRouter} from 'react-router-dom';
+import { Router, Route, Redirect, browserHistory } from 'react-router';
 
 
 import IssueList from './IssueList.jsx';
@@ -35,24 +35,18 @@ App.propTypes = {
 
 
 const RoutedApp = () => (
-    <Router history={browserHistory} >
-    <App>
-
-    <Switch>
-      <Route path="/issues/:id" component={IssueEdit}/>
-      <Route path="/issues" component={IssueList} />
-      <Redirect exact from="/" to="/issues"/>
+  <Router history={browserHistory} >
+    <Redirect from="/" to="#/issues" />
+    <Route path="#/" component={App} >
+      <Route path="issues" component={IssueList} />
+      <Route path="issues/:id" component={IssueEdit} />
       <Route path="*" component={NoMatch} />
-
-
-    </Switch>
-    </App>
+    </Route>
   </Router>
-
 );
 
 ReactDOM.render(<RoutedApp />, contentNode);
 
 if(module.hot){
-module.hot.accept();
+  module.hot.accept();
 }

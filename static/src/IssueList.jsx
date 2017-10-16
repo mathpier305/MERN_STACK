@@ -1,7 +1,7 @@
 import React from 'react';
 import 'whatwg-fetch';
 import PropTypes from 'prop-types';
-import {Link, withRouter} from 'react-router-dom';
+import {Link, withRouter} from 'react-router';
 
 import IssueAdd from './IssueAdd.jsx';
 import IssueFilter from './IssueFilter.jsx';
