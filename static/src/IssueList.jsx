@@ -143,7 +143,6 @@ class IssueList extends React.Component {
   render() {
     return (
       <div>
-      console.log(this.props.location);
       <IssueFilter setFilter={this.setFilter}
       initFilter={this.props.location.query}  />
         <hr />

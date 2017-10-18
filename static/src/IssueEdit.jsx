@@ -11,7 +11,7 @@ constructor(props){
     return (
       <div>
         <p>This is a placeholder for editing issue.
-         = {this.props.match.params.id}
+         = {this.props.params.id}
         </p>
         <Link to="/issues"> Back to issues List </Link>
       </div>
