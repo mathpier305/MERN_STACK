@@ -17,7 +17,7 @@ export default class IssueFilter extends React.Component{
     this.onChangeStatus = this.onChangeStatus.bind(this);
     this.onChangeEffortGte = this.onChangeEffortGte.bind(this);
     this.onChangeEffortLte = this.onChangeEffortLte.bind(this);
-    this.applyFiliter = this.applyFilter.bind(this);
+    this.applyFilter = this.applyFilter.bind(this);
     this.resetFilter = this.resetFilter.bind(this);
     this.clearFilter = this.clearFilter.bind(this);
   }
