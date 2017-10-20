@@ -33,7 +33,6 @@ App.propTypes = {
 };
 
 
-
 const RoutedApp = () => (
   <Router history={browserHistory} >
     <Redirect from="/" to="/issues" />
