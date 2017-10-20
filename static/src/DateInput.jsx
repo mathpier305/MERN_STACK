@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 export default class DateInput extends React.Component{
   constructor(props){
     super(props);
+    console.log(props.value);
+    console.log(typeof props.value);
     this.state = { value: this.editFormat(props.value),
                   focused: false, valid: true};
     this.onFocus = this.onFocus.bind(this);
@@ -25,7 +27,7 @@ export default class DateInput extends React.Component{
     const value = this.unformat(this.state.value);
     const valid = this.state.value === '' || value != null;
 
-    if(valid !== this.state.valie && this.props.onvalidityChange){
+    if(valid !== this.state.valid && this.props.onvalidityChange){
         this.props.onValidityChange(e, valid);
     }
     this.setState({focused: false, valid});
@@ -39,12 +41,12 @@ export default class DateInput extends React.Component{
   }
 
   displayFormat(date){
-    return (date != null) ? date.toDateString() : '';
+    return (date !== null && date !== '') ? new Date(date).toDateString() : '';
   }
 
   editFormat(date){
-    var myDate = Date.now();
-    return (date != null) ? myDate.toISOString().substr(0, 10) : '';
+    // var myDate = Date.now(); // Date.now() returns a string, so you can't call toDateString() again on a string
+    return (date !== null && date !== '') ? new Date(date).toDateString() : '';
   }
 
   unformat(str){

@@ -13,7 +13,7 @@ constructor(props){
         title: '',
         status:'',
         owner:'',
-        effort:null,
+        effort: null,
         completionDate: null,
         created: '',
       },
@@ -47,8 +47,7 @@ onValidityChange(event, valid){
 onChange(event, convertedValue){
   const issue =  Object.assign({}, this.state.isssue);
   const value = (convertedValue !== undefined) ? convertedValue : event.target.value;
-  convertedValue = event.target.value;
-  issue[event.target.name] = value;
+  issue[event.target.name] = new Date(value).toDateString();
   this.setState({issue});
 }
 
@@ -59,7 +58,6 @@ loadData(){
         issue.created = issue.created != null ? new Date(issue.created).toDateString() : '';
         issue.completionDate = issue.completionDate != null ?
          new Date(issue.completionDate) : '';
-
         this.setState({ issue });
       });
     }else{
