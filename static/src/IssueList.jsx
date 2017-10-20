@@ -60,9 +60,8 @@ class IssueList extends React.Component {
     this.createIssue = this.createIssue.bind(this);
     this.setFilter = this.setFilter.bind(this);
   }
+  
   setFilter(query){
-
-
     if(this.props.location.query !== query){
       this.props.router.push({ pathname: this.props.location.pathname, query  });
     }else{
