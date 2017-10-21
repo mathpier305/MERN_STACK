@@ -48,6 +48,7 @@ onChange(event, convertedValue){
   const issue =  Object.assign({}, this.state.isssue);
   const value = (convertedValue !== undefined) ? convertedValue : event.target.value;
 
+  issue[event.target.name] = value;
   this.setState({issue});
 }
 
@@ -58,7 +59,6 @@ loadData(){
         issue.created = issue.created != null ? new Date(issue.created).toDateString() : '';
         issue.completionDate = issue.completionDate != null ?
          new Date(issue.completionDate) : '';
-
         this.setState({ issue });
       });
     }else{

@@ -46,6 +46,7 @@ export default class DateInput extends React.Component{
   }
 
   editFormat(date){
+    var myDate = Date.now();
     return (date !== null && date !== '') ? new Date(date).toDateString() : '';
   }
 
