@@ -21,15 +21,15 @@ constructor(props){
   };
   this.onChange = this.onChange.bind(this);
   this.onValidityChange = this.onValidityChange.bind(this);
+  this.onSubmit = this.onSubmit.bind(this);
 }
 componentDidMount(){
     this.loadData();
 }
 
 componentDidUpdate(prevProps){
-  console.log("componentDidUpdate");
+
   if(prevProps.params.id !== this.props.params.id){
-    console.log("componentDidUpdate inside");
     this.loadData();
   }
 }
@@ -42,6 +42,35 @@ onValidityChange(event, valid){
     delete invalidFields[event.target.name];
   }
   this.setState({invalidFields});
+}
+
+onSubmit(event){
+  event.preventDefault();
+  if(Object.keys(this.state.invalidFields).length !== 0){
+    return;
+  }
+  fetch(`/api/issues/${this.props.params.id}`, {
+    method:'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(this.state.issue),
+  }).then(response =>{
+    if(response.ok){
+    response.json().then(updateIssue =>{
+      updateIssue.created  = new Date(updateIssue.created);
+      if(updateIssue.completionDate){
+        updateIssue.completionDate = new Date(updateIssue.completionDate);
+      }
+      this.setState({issue: updateIssue});
+      alert('Updated issue successfully.');
+    });
+  }else{
+    response.json().then(error=>{
+      alert(`Failed to update issue: ${error.message}`);
+    });
+  }
+}).catch(err =>{
+  alert(`Error in sending data to server: ${err.message}`);
+});
 }
 
 onChange(event, convertedValue){
@@ -63,7 +92,7 @@ loadData(){
   fetch(`/api/issues/${this.props.params.id}`).then(response =>{
     if(response.ok){
       response.json().then(issue =>{
-        issue.created = issue.created != null ? new Date(issue.created).toDateString() : '';
+        issue.created = new Date(issue.created);
         issue.completionDate = issue.completionDate != null ?
          new Date(issue.completionDate) : '';
         this.setState({ issue });
@@ -85,10 +114,10 @@ loadData(){
 
     return (
       <div>
-        <form>
+        <form onSubmit={this.onSubmit}>
           Id: {issue._id}
           <br />
-          Created: {issue.created}
+          Created: {issue.created ? issue.created.toDateString : ''}
           <br />
           Status:
           <select name="status" value={issue.status} onChange={this.onChange}>

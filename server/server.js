@@ -1,25 +1,26 @@
+import SourceMapSupport from 'source-map-support';
+SourceMapSupport.install();
+import 'babel-polyfill';
+
+import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import Issue from './issue.js';
-import 'babel-polyfill';
-import path from 'path';
-import SourceMapSupport from 'source-map-support';
 
-SourceMapSupport.install();
-
-const port = parseInt(process.env.PORT, 10) ||8080;
-
-var ObjectId = require('mongodb').ObjectId;
 const app = express();
 app.use(express.static('static'));
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json({type: 'application/*+json'}));
+app.use(bodyParser.json());
+
+
+// app.use(bodyParser.urlencoded({extended: true}));
+// app.use(bodyParser.json({type: 'application/*+json'}));
 //app.use(require('connect').bodyParser());
 //app.use(app.router);
 
 
 
+let db;
 
 
 if (process.env.NODE_ENV !== 'production') {
@@ -38,8 +39,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 app.put('/api/issues/:id', (req, res)=> {
-    var task = req.body;
-    console.log("the body is : "+task.query);
 
     let issueId;
     try{
@@ -57,7 +56,8 @@ app.put('/api/issues/:id', (req, res)=> {
       return;
     }
 
-    db.collection('issues').update({_id: issueId},
+console.log("the title to update is : "+issue.created);
+    db.collection('issues').updateOne({_id: issueId},
     Issue.convertIssue(issue)).then(()=>
       db.collection('issues').find({_id: issueId}).limit(1)
     .next()
@@ -69,18 +69,6 @@ app.put('/api/issues/:id', (req, res)=> {
       console.log(error);
       res.status(500).json({message: `Internal Server error : ${error}`});
     });
-});
-
-
-let db;
-MongoClient.connect('mongodb://localhost/issuetracker').then((connection) => {
-  db = connection;
-
-  app.listen(8080, () => {
-    console.log('App started on port 3000');
-  });
-}).catch((error) => {
-  console.log('ERROR', error);
 });
 
 app.get('/api/issues', (req, res) => {
@@ -124,14 +112,14 @@ app.get('/api/issues/:id', (req, res) =>{
 });
 
 app.post('/api/issues', (req, res) => {
-  console.log('******** hello ********');
+
   const newIssue = req.body;
   // newIssue.id = issues.length +1;
   newIssue.created = new Date();
   if (!newIssue.status) {
     newIssue.status = 'New';
   }
-
+console.log('******** hello ********');
   const err = Issue.validateIssue(newIssue);
   if (err) {
     console.log('******** error ********');
@@ -163,3 +151,13 @@ app.post('/api/issues', (req, res) => {
 // app.listen(3000, ()=>{
 //   console.log('App started on port 3000');
 // });
+
+MongoClient.connect('mongodb://localhost/issuetracker').then((connection) => {
+  db = connection;
+
+  app.listen(3000, () => {
+    console.log('App started on port 3000');
+  });
+}).catch((error) => {
+  console.log('ERROR', error);
+});
