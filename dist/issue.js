@@ -29,9 +29,17 @@ function cleanupIssue(issue) {
   return cleanedUpIssue;
 }
 
+function convertIssue(isssue) {
+  if (issue.created) issue.created = new Date(issue.created);
+  if (issue.completionDate) issue.completionDate = new Date(issue.completionDate);
+  return cleanupIssue(issue);
+}
+
 function validateIssue(issue) {
   const errors = [];
+  console.log(issue.status);
   Object.keys(issueFieldType).forEach(field => {
+    console.log(issue[field]);
     if (issueFieldType[field] === 'required' && !issue[field]) {
       errors.push(`Missing mandatory field: ${field}`);
     }
@@ -45,6 +53,7 @@ function validateIssue(issue) {
 
 exports.default = {
   validateIssue: validateIssue,
-  cleanupIssue: cleanupIssue
+  cleanupIssue: cleanupIssue,
+  convertIssue: convertIssue
 };
 //# sourceMappingURL=issue.js.map

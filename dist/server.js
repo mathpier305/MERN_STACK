@@ -28,21 +28,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 _sourceMapSupport2.default.install();
 
+const port = parseInt(process.env.PORT, 10) || 8080;
+
 var ObjectId = require('mongodb').ObjectId;
 const app = (0, _express2.default)();
 app.use(_express2.default.static('static'));
-app.use(_bodyParser2.default.json());
+app.use(_bodyParser2.default.urlencoded({ extended: true }));
+app.use(_bodyParser2.default.json({ type: 'application/*+json' }));
+//app.use(require('connect').bodyParser());
+//app.use(app.router);
 
-let db;
-_mongodb.MongoClient.connect('mongodb://localhost/issuetracker').then(connection => {
-  db = connection;
-
-  app.listen(3000, () => {
-    console.log('App started on port 3000');
-  });
-}).catch(error => {
-  console.log('ERROR', error);
-});
 
 if (process.env.NODE_ENV !== 'production') {
   const webpack = require('webpack');
@@ -57,6 +52,45 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(webpackDevMiddleware(bundler, { noInfo: true }));
   app.use(webpackHotMiddleware(bundler, { log: console.log }));
 }
+
+app.put('/api/issues/:id', (req, res) => {
+  var task = req.body;
+  console.log("the body is : " + task.query);
+
+  let issueId;
+  try {
+    issueId = new ObjectId(req.params.id);
+  } catch (error) {
+    res.status(422).json({ message: `Invalid issue ID format : ${error}` });
+    return;
+  }
+  const issue = req.body;
+
+  delete issue._id;
+  const err = _issue2.default.validateIssue(issue);
+  if (err) {
+    res.status(422).json({ message: `Invalid request: ${err}` });
+    return;
+  }
+
+  db.collection('issues').update({ _id: issueId }, _issue2.default.convertIssue(issue)).then(() => db.collection('issues').find({ _id: issueId }).limit(1).next()).then(savedIssue => {
+    res.json(savedIssue);
+  }).catch(error => {
+    console.log(error);
+    res.status(500).json({ message: `Internal Server error : ${error}` });
+  });
+});
+
+let db;
+_mongodb.MongoClient.connect('mongodb://localhost/issuetracker').then(connection => {
+  db = connection;
+
+  app.listen(8080, () => {
+    console.log('App started on port 3000');
+  });
+}).catch(error => {
+  console.log('ERROR', error);
+});
 
 app.get('/api/issues', (req, res) => {
   const filter = {};
