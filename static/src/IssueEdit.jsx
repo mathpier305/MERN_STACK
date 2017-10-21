@@ -13,7 +13,7 @@ constructor(props){
         title: '',
         status:'',
         owner:'',
-        effort:null,
+        effort: null,
         completionDate: null,
         created: '',
       },
@@ -47,8 +47,7 @@ onValidityChange(event, valid){
 onChange(event, convertedValue){
   const issue =  Object.assign({}, this.state.isssue);
   const value = (convertedValue !== undefined) ? convertedValue : event.target.value;
-  convertedValue = event.target.value;
-  issue[event.target.name] = value;
+
   this.setState({issue});
 }
 
@@ -100,7 +99,7 @@ loadData(){
           Effort
           <NumInput size={5} name="effort" type="text" value={this.state.issue.effort} onChange={this.onChange} />
           <br />
-         Completion Date:
+        Completion Date:
           <DateInput name="completionDate" value={issue.completionDate}
             onChange={this.onChange} onValidityChange={this.onValidityChange} />
           <br />
