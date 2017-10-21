@@ -25,7 +25,7 @@ export default class DateInput extends React.Component{
     const value = this.unformat(this.state.value);
     const valid = this.state.value === '' || value != null;
 
-    if(valid !== this.state.valid && this.props.onvalidityChange){
+    if(valid !== this.state.valid && this.props.onValidityChange){
         this.props.onValidityChange(e, valid);
     }
     this.setState({focused: false, valid});
@@ -39,12 +39,12 @@ export default class DateInput extends React.Component{
   }
 
   displayFormat(date){
-    return (date !== null && date !== '') ? new Date(date).toDateString() : '';
+    return (date != null && date !== '') ? new Date(date).toDateString() : '';
   }
 
   editFormat(date){
     // var myDate = Date.now(); // Date.now() returns a string, so you can't call toDateString() again on a string
-    return (date !== null && date !== '') ? new Date(date).toDateString() : '';
+    return (date != null && date !== '') ? new Date(date).toDateString() : '';
   }
 
   unformat(str){
@@ -59,7 +59,7 @@ export default class DateInput extends React.Component{
      this.state.value : this.displayFormat(this.props.value);
      return (
        <input type="text" size={20} name={this.props.name} className={className}
-      value={value} placeholder={this.state.focused ? 'yyyy-mm-dd': null}
+      value={value} placeholder='yyyy-mm-dd'
      onFocus={this.onFocus} onBlur={this.onBlur} onChange={this.onChange} />
    );
   }

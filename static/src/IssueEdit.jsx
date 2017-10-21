@@ -45,9 +45,17 @@ onValidityChange(event, valid){
 }
 
 onChange(event, convertedValue){
-  const issue =  Object.assign({}, this.state.isssue);
-  const value = (convertedValue !== undefined) ? convertedValue : event.target.value;
-  issue[event.target.name] = new Date(value).toDateString();
+  const issue =  Object.assign({}, this.state.issue);
+  const value = (convertedValue != null) ? convertedValue : event.target.value;
+  issue[event.target.name] = value;
+
+  if (event.target.name === 'effort' && value === '') {
+    issue[event.target.name] = null;
+  }
+
+  if (event.target.name === 'completionDate' && typeof value !== 'string') {
+    issue[event.target.name] = value.toDateString();
+  }
   this.setState({issue});
 }
 

@@ -24,7 +24,7 @@ export default class NumInput extends React.Component{
   }
 
   format(num){
-    return num != null ? num.toString : '';
+    return num != null ? num.toString() : '';
   }
 
   unformat(str){
