@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Router, Route, Redirect, browserHistory } from 'react-router';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, Glyphicon} from 'react-bootstrap';
-//import {LinkContainer } from 'react-router-bootstrap';
-import LinkContainer from '../../node_modules/react-router-bootstrap/lib/LinkContainer';
+import {LinkContainer } from 'react-router-bootstrap';
+
 
 
 import IssueList from './IssueList.jsx';
@@ -20,10 +20,10 @@ const Header = () =>(
       <Navbar.Brand> Issue Tracker </Navbar.Brand>
     </Navbar.Header>
     <Nav>
-    <LinkContainer to={{pathname: '/issues'}}>
+    <LinkContainer to="/issues">
         <NavItem>Issues</NavItem>
       </LinkContainer>
-      <LinkContainer to={{pathname: 'reports'}}>
+      <LinkContainer to="reports">
         <NavItem>reports </NavItem>
       </LinkContainer>
     </Nav>
