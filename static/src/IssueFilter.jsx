@@ -114,7 +114,7 @@ export default class IssueFilter extends React.Component{
               </InputGroup>
             </FormGroup>
           </Col>
-          <Col xs={6} sm={4} md={3} lg={2} >
+          <Col xs={6} sm={4} md={4} lg={3} >
             <FormGroup>
               <ControlLabel>&npsp; </ControlLabel>
               <ButtonToolbar>
@@ -123,7 +123,7 @@ export default class IssueFilter extends React.Component{
                 <Button  onClick={this.clearFilter}> Clear </Button>
               </ButtonToolbar>
             </FormGroup>
-          </Col> 
+          </Col>
         </Row>
     );
   }
