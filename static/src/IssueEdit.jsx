@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
+import { LinkContainer} from 'react-router-bootstrap';
+import {FormGroup, FormControl, ControlLabel, ButtonToolbar,
+      Button, Panel, Form, Col } from 'react-bootstrap';
+
 import NumInput from './NumInput.jsx';
 import DateInput from './DateInput.jsx';
 
@@ -113,9 +117,62 @@ loadData(){
     null : (<div className="error"> Please correct invalid Fields before submitting. </div>);
 
     return (
-      <div>
-        <form onSubmit={this.onSubmit}>
-          Id: {issue._id}
+      <Panel header="Edit Issue">
+        <Form horizontal onSubmit={this.onSubmit}>
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3}>ID</Col>
+            <Col sm={9}><FormControl.Static>{issue._id}</FormControl.Static></Col>
+          </FormGroup>
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3}>Created</Col>
+            <Col sm={9}><FormControl.Static>
+              {issue.created ? issue.created.toDateString() : ''}
+            </FormControl.Static></Col>
+          </FormGroup>
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3}>Status</Col>
+            <Col sm={9}>
+              <FormControl componentClass="select" name="status" value={issue.status} onChange={this.onChange}>
+                <option value="New"> New </option>
+                <option value="Open">Open </option>
+                <option value="Assigned"> Assigned </option>
+                <option value="Fixed"> Fixed </option>
+                <option value="Verified">Verified </option>
+                <option value="Closed"> Closed </option>
+              </FormControl>
+            </Col>
+          </FormGroup>
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3}>Owner </Col>
+            <Col sm={9}>
+              <FormControl name="owner"  type="text" value={this.state.issue.owner} onChange={this.onChange} />
+            </Col>
+          </FormGroup>
+          <FormGroup>
+            <Col componentClass={ControlLabel} sm={3}>Effort</Col>
+            <Col sm={9}>
+              <FormControl componentClass={NumInput} name="effort" type="text" value={this.state.issue.effort} onChange={this.onChange} />
+            </Col>
+          </FormGroup>
+          <FormGroup validationState={this.state.invalidFields.completionDate ? 'error' : null}>
+            <Col componentClass={ControlLabel} sm={3}> Completion Date </Col>
+            <Col sm={9}>
+              <FormControl componentClass={DateInput} name="completionDate"  value={issue.completionDate}
+                onChange={this.onChange} onValidityChange={this.onValidityChange} />
+                <FormControl.Feedback />
+            </Col>
+          </FormGroup>
+          <FormGroup>
+            <Col smOffset={3} sm={6}>
+              <ButtonToolbar>
+                <Button bsStyle="primary" type="submit">Submit</Button>
+                <LinkContainer to="/issues">
+                  <Button bsStyle="link">Back </Button>
+                </LinkContainer>
+              </ButtonToolbar>
+            </Col>
+          </FormGroup>
+          {/*Id: {issue._id}
           <br />
           Created: {issue.created ? issue.created.toDateString : ''}
           <br />
@@ -144,14 +201,15 @@ loadData(){
           <br />
           {validationMessage}
           <button type="submit"> Submit </button>
-          <Link to="/issues"> Back to issue List </Link>
+          <Link to="/issues"> Back to issue List </Link> */}
 
-        </form>
+        </Form>
+        {validationMessage}
         <p>This is a placeholder for editing issue.
          = {this.props.params.id}
         </p>
         <Link to="/issues"> Back to issues List </Link>
-      </div>
+      </Panel>
     );
   }
 }
