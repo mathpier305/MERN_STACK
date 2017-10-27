@@ -6,6 +6,7 @@ import {Button, Glyphicon, Table, Panel } from 'react-bootstrap';
 
 import IssueAdd from './IssueAdd.jsx';
 import IssueFilter from './IssueFilter.jsx';
+import Toast from './Toast.jsx';
 
 
 const IssueRow = (props) => {
@@ -68,11 +69,23 @@ IssueTable.propTypes = {
 class IssueList extends React.Component {
   constructor() {
     super();
-    this.state = { issues: [] };
+    this.state = { issues: [], toastVisible: false,
+    toastMessage: '', toastType: 'success' };
 
     this.createIssue = this.createIssue.bind(this);
     this.setFilter = this.setFilter.bind(this);
     this.deleteIssue = this.deleteIssue.bind(this);
+    this.showError = this.showError.bind(this);
+    this.dismissToast = this.dismissToast.bind(this);
+  }
+
+  showError(message){
+    this.setState({toastVisible: true, toastMessage: message,
+                  toastType: 'danger'});
+  }
+
+  dismissToast(){
+    this.setState({toastVisible: false});
   }
 
   deleteIssue(id){
@@ -124,11 +137,11 @@ class IssueList extends React.Component {
         });
       } else {
         response.json().then(error => {
-          alert(`Failed to fetch issues ${error.message}`);
+          this.showError(`Failed to fetch issues ${error.message}`);
         });
       }
     }).catch(err => {
-      alert(`Error in fetching data from server: ${err}`);
+      this.showError(`Error in fetching data from server: ${err}`);
     });
   }
 
@@ -149,11 +162,11 @@ class IssueList extends React.Component {
         });
       } else {
         response.json().then(error => {
-          alert(`Failed to add issue: ${error.message}`);
+          this.showError(`Failed to add issue: ${error.message}`);
         });
       }
     }).catch(err => {
-      alert(`Error in sending data to server: ${err.message}`);
+      this.showError(`Error in sending data to server: ${err.message}`);
     });
   }
 
@@ -168,6 +181,9 @@ class IssueList extends React.Component {
         <IssueTable issues={this.state.issues} deleteIssue={this.deleteIssue}/>
 
         <IssueAdd createIssue={this.createIssue} />
+        <Toast showing={this.state.toastVisible} message={this.state.toastMessage}
+          onDismiss={this.dismissToast} bsStyle={this.state.toastType} />
+          
       </div>
     );
   }
