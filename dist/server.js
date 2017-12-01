@@ -6,10 +6,6 @@ var _sourceMapSupport2 = _interopRequireDefault(_sourceMapSupport);
 
 require('babel-polyfill');
 
-var _path = require('path');
-
-var _path2 = _interopRequireDefault(_path);
-
 var _express = require('express');
 
 var _express2 = _interopRequireDefault(_express);
@@ -24,9 +20,15 @@ var _issue = require('./issue.js');
 
 var _issue2 = _interopRequireDefault(_issue);
 
+var _renderedPageRouter = require('./renderedPageRouter.jsx');
+
+var _renderedPageRouter2 = _interopRequireDefault(_renderedPageRouter);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 _sourceMapSupport2.default.install();
+
+//import path from 'path';
 
 
 const app = (0, _express2.default)();
@@ -160,9 +162,10 @@ app.post('/api/issues', (req, res) => {
     });
   });
 
-  app.get('*', (req, res) => {
-    res.sendFile(_path2.default.resolve('static/index.html'));
-  });
+  // app.get('*', (req, res) => {
+  //   res.sendFile(path.resolve('static/index.html'));
+  // });
+  app.use('/', _renderedPageRouter2.default);
   // issues.push(newIssue);
 
   // res.json(newIssue);

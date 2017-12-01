@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 node_modules
-=======
+mongodata/
 node_modules/
->>>>>>> master
 package-lock.json

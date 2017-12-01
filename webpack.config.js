@@ -2,7 +2,8 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: {
-    app: ['./static/src/App.jsx'],
+    //app: ['./static/src/App.jsx'],
+    app:'./client/Client.jsx',
     vendor: ['react', 'react-dom', 'whatwg-fetch', 'react-router',
               'react-bootstrap', 'react-router-bootstrap'],
   },
@@ -18,7 +19,7 @@ module.exports = {
     port: 8000,
     contentBase: 'static',
     proxy: {
-      '/api/*': {
+      '*': {
         target: 'http://localhost:3000',
       },
       historyApiFallback: true,

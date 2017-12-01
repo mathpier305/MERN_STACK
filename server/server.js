@@ -2,11 +2,12 @@ import SourceMapSupport from 'source-map-support';
 SourceMapSupport.install();
 import 'babel-polyfill';
 
-import path from 'path';
+//import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
 import { MongoClient, ObjectId } from 'mongodb';
 import Issue from './issue.js';
+import renderedPageRouter from './renderedPageRouter.jsx';
 
 const app = express();
 app.use(express.static('static'));
@@ -158,9 +159,10 @@ console.log('******** hello ********');
       });
   });
 
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve('static/index.html'));
-  });
+  // app.get('*', (req, res) => {
+  //   res.sendFile(path.resolve('static/index.html'));
+  // });
+  app.use('/', renderedPageRouter);
   // issues.push(newIssue);
 
   // res.json(newIssue);
