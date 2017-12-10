@@ -3,8 +3,8 @@ const webpack = require('webpack');
 module.exports = {
   entry: {
     //app: ['./static/src/App.jsx'],
-    app:'./client/Client.jsx',
-    vendor: ['react', 'react-dom', 'whatwg-fetch', 'react-router',
+    app:['./client/Client.jsx'],
+    vendor: ['react', 'react-dom', 'isomorphic-fetch', 'react-router',
               'react-bootstrap', 'react-router-bootstrap'],
   },
   output: {

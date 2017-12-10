@@ -20,7 +20,7 @@ var _issue = require('./issue.js');
 
 var _issue2 = _interopRequireDefault(_issue);
 
-var _renderedPageRouter = require('./renderedPageRouter.jsx');
+var _renderedPageRouter = require('./renderedPageRouter.js');
 
 var _renderedPageRouter2 = _interopRequireDefault(_renderedPageRouter);
 
@@ -165,12 +165,13 @@ app.post('/api/issues', (req, res) => {
   // app.get('*', (req, res) => {
   //   res.sendFile(path.resolve('static/index.html'));
   // });
-  app.use('/', _renderedPageRouter2.default);
+
   // issues.push(newIssue);
 
   // res.json(newIssue);
 });
 
+app.use('*', _renderedPageRouter2.default);
 // app.listen(3000, ()=>{
 //   console.log('App started on port 3000');
 // });

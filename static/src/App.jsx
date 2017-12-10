@@ -1,17 +1,17 @@
 import 'babel-polyfill';
 import React from 'react';
 import PropTypes from 'prop-types';
-import ReactDOM from 'react-dom';
-import { Router, Route, Redirect, browserHistory } from 'react-router';
+//import ReactDOM from 'react-dom';
+//import { Router, Route, Redirect, browserHistory } from 'react-router';
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem, Glyphicon } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 
-import IssueList from './IssueList.jsx';
-import IssueEdit from './IssueEdit.jsx';
+//import IssueList from './IssueList.jsx';
+//import IssueEdit from './IssueEdit.jsx';
 
-const contentNode = document.getElementById('contents');
-const NoMatch = () => <p> Page Not Found </p>;
+//const contentNode = document.getElementById('contents');
+//const NoMatch = () => <p> Page Not Found </p>;
 
 const Header = () =>(
   <Navbar fluid>
@@ -55,19 +55,21 @@ App.propTypes = {
 };
 
 
-const RoutedApp = () => (
-  <Router history={browserHistory} >
-    <Redirect from="/" to="/issues" />
-    <Route path="/" component={App} >
-      <Route path="issues" component={IssueList} />
-      <Route path="issues/:id" component={IssueEdit} />
-      <Route path="*" component={NoMatch} />
-    </Route>
-  </Router>
-);
+// const RoutedApp = () => (
+//   <Router history={browserHistory} >
+//     <Redirect from="/" to="/issues" />
+//     <Route path="/" component={App} >
+//       <Route path="issues" component={IssueList} />
+//       <Route path="issues/:id" component={IssueEdit} />
+//       <Route path="*" component={NoMatch} />
+//     </Route>
+//   </Router>
+// );
 
-ReactDOM.render(<RoutedApp />, contentNode);
+// ReactDOM.render(<RoutedApp />, contentNode);
+//
+// if(module.hot){
+//   module.hot.accept();
+// }
 
-if(module.hot){
-  module.hot.accept();
-}
+export default App;

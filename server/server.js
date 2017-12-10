@@ -1,13 +1,13 @@
-import SourceMapSupport from 'source-map-support';
-SourceMapSupport.install();
-import 'babel-polyfill';
+// import SourceMapSupport from 'source-map-support';
+// SourceMapSupport.install();
+// import 'babel-polyfill';
 
 //import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
-import { MongoClient, ObjectId } from 'mongodb';
+import {ObjectId } from 'mongodb';
 import Issue from './issue.js';
-import renderedPageRouter from './renderedPageRouter.jsx';
+import renderedPageRouter from './renderedPageRouter';
 
 const app = express();
 app.use(express.static('static'));
@@ -162,22 +162,28 @@ console.log('******** hello ********');
   // app.get('*', (req, res) => {
   //   res.sendFile(path.resolve('static/index.html'));
   // });
-  app.use('/', renderedPageRouter);
+
   // issues.push(newIssue);
 
   // res.json(newIssue);
 });
-
+app.use('*', renderedPageRouter);
 // app.listen(3000, ()=>{
 //   console.log('App started on port 3000');
 // });
 
-MongoClient.connect('mongodb://localhost/issuetracker').then((connection) => {
-  db = connection;
+function setDB(newDB){
+  db = newDB;
+}
 
-  app.listen(3000, () => {
-    console.log('App started on port 3000');
-  });
-}).catch((error) => {
-  console.log('ERROR', error);
-});
+export {app, setDB};
+
+// MongoClient.connect('mongodb://localhost/issuetracker').then((connection) => {
+//   db = connection;
+//
+//   app.listen(3000, () => {
+//     console.log('App started on port 3000');
+//   });
+// }).catch((error) => {
+//   console.log('ERROR', error);
+// });
