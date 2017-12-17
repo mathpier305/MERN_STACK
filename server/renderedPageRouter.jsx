@@ -28,7 +28,7 @@ renderedPageRouter.get('*', (req, res) =>{
         location: renderProps.location,
         urlBase : 'http://localhost:3000'
       }));
-      Promise.all(dataFetcher).then((dataList)=>{
+      Promise.all(dataFetchers).then((dataList)=>{
         let initialState ={};
         dataList.forEach((namedData)=>{
           initialState = Object.assign(initialState, namedData);

@@ -47,6 +47,9 @@ renderedPageRouter.get('*', (req, res) => {
     if (error) {
       console.log(" there is an error here : ", error);
       res.status(500).send(error.message);
+    } else if (redirectLocation) {
+      console.log(" there is the redirectLocation here : ", redirectLocation);
+      res.redirect(302, redirectLocation.pathname + redirectLocation.search);
     } else if (renderProps) {
       const componentsWithData = renderProps.components.filter(c => c.dataFetcher);
       const dataFetchers = componentsWithData.map(c => c.dataFetcher({
@@ -54,7 +57,7 @@ renderedPageRouter.get('*', (req, res) => {
         location: renderProps.location,
         urlBase: 'http://localhost:3000'
       }));
-      Promise.all(dataFetcher).then(dataList => {
+      Promise.all(dataFetchers).then(dataList => {
         let initialState = {};
         dataList.forEach(namedData => {
           initialState = Object.assign(initialState, namedData);

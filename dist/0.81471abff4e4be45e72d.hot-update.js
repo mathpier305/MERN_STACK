@@ -1,690 +1,5 @@
-(function(e, a) { for(var i in a) e[i] = a[i]; }(exports, /******/ (function(modules) { // webpackBootstrap
-/******/ 	function hotDownloadUpdateChunk(chunkId) { // eslint-disable-line no-unused-vars
-/******/ 		var chunk = require("./" + "" + chunkId + "." + hotCurrentHash + ".hot-update.js");
-/******/ 		hotAddUpdateChunk(chunk.id, chunk.modules);
-/******/ 	}
-/******/ 	
-/******/ 	function hotDownloadManifest() { // eslint-disable-line no-unused-vars
-/******/ 		try {
-/******/ 			var update = require("./" + "" + hotCurrentHash + ".hot-update.json");
-/******/ 		} catch(e) {
-/******/ 			return Promise.resolve();
-/******/ 		}
-/******/ 		return Promise.resolve(update);
-/******/ 	}
-/******/ 	
-/******/ 	function hotDisposeChunk(chunkId) { //eslint-disable-line no-unused-vars
-/******/ 		delete installedChunks[chunkId];
-/******/ 	}
-/******/
-/******/ 	
-/******/ 	
-/******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "7c603e8c856adef1eac9"; // eslint-disable-line no-unused-vars
-/******/ 	var hotRequestTimeout = 10000;
-/******/ 	var hotCurrentModuleData = {};
-/******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
-/******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
-/******/ 	var hotCurrentParentsTemp = []; // eslint-disable-line no-unused-vars
-/******/ 	
-/******/ 	function hotCreateRequire(moduleId) { // eslint-disable-line no-unused-vars
-/******/ 		var me = installedModules[moduleId];
-/******/ 		if(!me) return __webpack_require__;
-/******/ 		var fn = function(request) {
-/******/ 			if(me.hot.active) {
-/******/ 				if(installedModules[request]) {
-/******/ 					if(installedModules[request].parents.indexOf(moduleId) < 0)
-/******/ 						installedModules[request].parents.push(moduleId);
-/******/ 				} else {
-/******/ 					hotCurrentParents = [moduleId];
-/******/ 					hotCurrentChildModule = request;
-/******/ 				}
-/******/ 				if(me.children.indexOf(request) < 0)
-/******/ 					me.children.push(request);
-/******/ 			} else {
-/******/ 				console.warn("[HMR] unexpected require(" + request + ") from disposed module " + moduleId);
-/******/ 				hotCurrentParents = [];
-/******/ 			}
-/******/ 			return __webpack_require__(request);
-/******/ 		};
-/******/ 		var ObjectFactory = function ObjectFactory(name) {
-/******/ 			return {
-/******/ 				configurable: true,
-/******/ 				enumerable: true,
-/******/ 				get: function() {
-/******/ 					return __webpack_require__[name];
-/******/ 				},
-/******/ 				set: function(value) {
-/******/ 					__webpack_require__[name] = value;
-/******/ 				}
-/******/ 			};
-/******/ 		};
-/******/ 		for(var name in __webpack_require__) {
-/******/ 			if(Object.prototype.hasOwnProperty.call(__webpack_require__, name) && name !== "e") {
-/******/ 				Object.defineProperty(fn, name, ObjectFactory(name));
-/******/ 			}
-/******/ 		}
-/******/ 		fn.e = function(chunkId) {
-/******/ 			if(hotStatus === "ready")
-/******/ 				hotSetStatus("prepare");
-/******/ 			hotChunksLoading++;
-/******/ 			return __webpack_require__.e(chunkId).then(finishChunkLoading, function(err) {
-/******/ 				finishChunkLoading();
-/******/ 				throw err;
-/******/ 			});
-/******/ 	
-/******/ 			function finishChunkLoading() {
-/******/ 				hotChunksLoading--;
-/******/ 				if(hotStatus === "prepare") {
-/******/ 					if(!hotWaitingFilesMap[chunkId]) {
-/******/ 						hotEnsureUpdateChunk(chunkId);
-/******/ 					}
-/******/ 					if(hotChunksLoading === 0 && hotWaitingFiles === 0) {
-/******/ 						hotUpdateDownloaded();
-/******/ 					}
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 		return fn;
-/******/ 	}
-/******/ 	
-/******/ 	function hotCreateModule(moduleId) { // eslint-disable-line no-unused-vars
-/******/ 		var hot = {
-/******/ 			// private stuff
-/******/ 			_acceptedDependencies: {},
-/******/ 			_declinedDependencies: {},
-/******/ 			_selfAccepted: false,
-/******/ 			_selfDeclined: false,
-/******/ 			_disposeHandlers: [],
-/******/ 			_main: hotCurrentChildModule !== moduleId,
-/******/ 	
-/******/ 			// Module API
-/******/ 			active: true,
-/******/ 			accept: function(dep, callback) {
-/******/ 				if(typeof dep === "undefined")
-/******/ 					hot._selfAccepted = true;
-/******/ 				else if(typeof dep === "function")
-/******/ 					hot._selfAccepted = dep;
-/******/ 				else if(typeof dep === "object")
-/******/ 					for(var i = 0; i < dep.length; i++)
-/******/ 						hot._acceptedDependencies[dep[i]] = callback || function() {};
-/******/ 				else
-/******/ 					hot._acceptedDependencies[dep] = callback || function() {};
-/******/ 			},
-/******/ 			decline: function(dep) {
-/******/ 				if(typeof dep === "undefined")
-/******/ 					hot._selfDeclined = true;
-/******/ 				else if(typeof dep === "object")
-/******/ 					for(var i = 0; i < dep.length; i++)
-/******/ 						hot._declinedDependencies[dep[i]] = true;
-/******/ 				else
-/******/ 					hot._declinedDependencies[dep] = true;
-/******/ 			},
-/******/ 			dispose: function(callback) {
-/******/ 				hot._disposeHandlers.push(callback);
-/******/ 			},
-/******/ 			addDisposeHandler: function(callback) {
-/******/ 				hot._disposeHandlers.push(callback);
-/******/ 			},
-/******/ 			removeDisposeHandler: function(callback) {
-/******/ 				var idx = hot._disposeHandlers.indexOf(callback);
-/******/ 				if(idx >= 0) hot._disposeHandlers.splice(idx, 1);
-/******/ 			},
-/******/ 	
-/******/ 			// Management API
-/******/ 			check: hotCheck,
-/******/ 			apply: hotApply,
-/******/ 			status: function(l) {
-/******/ 				if(!l) return hotStatus;
-/******/ 				hotStatusHandlers.push(l);
-/******/ 			},
-/******/ 			addStatusHandler: function(l) {
-/******/ 				hotStatusHandlers.push(l);
-/******/ 			},
-/******/ 			removeStatusHandler: function(l) {
-/******/ 				var idx = hotStatusHandlers.indexOf(l);
-/******/ 				if(idx >= 0) hotStatusHandlers.splice(idx, 1);
-/******/ 			},
-/******/ 	
-/******/ 			//inherit from previous dispose call
-/******/ 			data: hotCurrentModuleData[moduleId]
-/******/ 		};
-/******/ 		hotCurrentChildModule = undefined;
-/******/ 		return hot;
-/******/ 	}
-/******/ 	
-/******/ 	var hotStatusHandlers = [];
-/******/ 	var hotStatus = "idle";
-/******/ 	
-/******/ 	function hotSetStatus(newStatus) {
-/******/ 		hotStatus = newStatus;
-/******/ 		for(var i = 0; i < hotStatusHandlers.length; i++)
-/******/ 			hotStatusHandlers[i].call(null, newStatus);
-/******/ 	}
-/******/ 	
-/******/ 	// while downloading
-/******/ 	var hotWaitingFiles = 0;
-/******/ 	var hotChunksLoading = 0;
-/******/ 	var hotWaitingFilesMap = {};
-/******/ 	var hotRequestedFilesMap = {};
-/******/ 	var hotAvailableFilesMap = {};
-/******/ 	var hotDeferred;
-/******/ 	
-/******/ 	// The update info
-/******/ 	var hotUpdate, hotUpdateNewHash;
-/******/ 	
-/******/ 	function toModuleId(id) {
-/******/ 		var isNumber = (+id) + "" === id;
-/******/ 		return isNumber ? +id : id;
-/******/ 	}
-/******/ 	
-/******/ 	function hotCheck(apply) {
-/******/ 		if(hotStatus !== "idle") throw new Error("check() is only allowed in idle status");
-/******/ 		hotApplyOnUpdate = apply;
-/******/ 		hotSetStatus("check");
-/******/ 		return hotDownloadManifest(hotRequestTimeout).then(function(update) {
-/******/ 			if(!update) {
-/******/ 				hotSetStatus("idle");
-/******/ 				return null;
-/******/ 			}
-/******/ 			hotRequestedFilesMap = {};
-/******/ 			hotWaitingFilesMap = {};
-/******/ 			hotAvailableFilesMap = update.c;
-/******/ 			hotUpdateNewHash = update.h;
-/******/ 	
-/******/ 			hotSetStatus("prepare");
-/******/ 			var promise = new Promise(function(resolve, reject) {
-/******/ 				hotDeferred = {
-/******/ 					resolve: resolve,
-/******/ 					reject: reject
-/******/ 				};
-/******/ 			});
-/******/ 			hotUpdate = {};
-/******/ 			var chunkId = 0;
-/******/ 			{ // eslint-disable-line no-lone-blocks
-/******/ 				/*globals chunkId */
-/******/ 				hotEnsureUpdateChunk(chunkId);
-/******/ 			}
-/******/ 			if(hotStatus === "prepare" && hotChunksLoading === 0 && hotWaitingFiles === 0) {
-/******/ 				hotUpdateDownloaded();
-/******/ 			}
-/******/ 			return promise;
-/******/ 		});
-/******/ 	}
-/******/ 	
-/******/ 	function hotAddUpdateChunk(chunkId, moreModules) { // eslint-disable-line no-unused-vars
-/******/ 		if(!hotAvailableFilesMap[chunkId] || !hotRequestedFilesMap[chunkId])
-/******/ 			return;
-/******/ 		hotRequestedFilesMap[chunkId] = false;
-/******/ 		for(var moduleId in moreModules) {
-/******/ 			if(Object.prototype.hasOwnProperty.call(moreModules, moduleId)) {
-/******/ 				hotUpdate[moduleId] = moreModules[moduleId];
-/******/ 			}
-/******/ 		}
-/******/ 		if(--hotWaitingFiles === 0 && hotChunksLoading === 0) {
-/******/ 			hotUpdateDownloaded();
-/******/ 		}
-/******/ 	}
-/******/ 	
-/******/ 	function hotEnsureUpdateChunk(chunkId) {
-/******/ 		if(!hotAvailableFilesMap[chunkId]) {
-/******/ 			hotWaitingFilesMap[chunkId] = true;
-/******/ 		} else {
-/******/ 			hotRequestedFilesMap[chunkId] = true;
-/******/ 			hotWaitingFiles++;
-/******/ 			hotDownloadUpdateChunk(chunkId);
-/******/ 		}
-/******/ 	}
-/******/ 	
-/******/ 	function hotUpdateDownloaded() {
-/******/ 		hotSetStatus("ready");
-/******/ 		var deferred = hotDeferred;
-/******/ 		hotDeferred = null;
-/******/ 		if(!deferred) return;
-/******/ 		if(hotApplyOnUpdate) {
-/******/ 			// Wrap deferred object in Promise to mark it as a well-handled Promise to
-/******/ 			// avoid triggering uncaught exception warning in Chrome.
-/******/ 			// See https://bugs.chromium.org/p/chromium/issues/detail?id=465666
-/******/ 			Promise.resolve().then(function() {
-/******/ 				return hotApply(hotApplyOnUpdate);
-/******/ 			}).then(
-/******/ 				function(result) {
-/******/ 					deferred.resolve(result);
-/******/ 				},
-/******/ 				function(err) {
-/******/ 					deferred.reject(err);
-/******/ 				}
-/******/ 			);
-/******/ 		} else {
-/******/ 			var outdatedModules = [];
-/******/ 			for(var id in hotUpdate) {
-/******/ 				if(Object.prototype.hasOwnProperty.call(hotUpdate, id)) {
-/******/ 					outdatedModules.push(toModuleId(id));
-/******/ 				}
-/******/ 			}
-/******/ 			deferred.resolve(outdatedModules);
-/******/ 		}
-/******/ 	}
-/******/ 	
-/******/ 	function hotApply(options) {
-/******/ 		if(hotStatus !== "ready") throw new Error("apply() is only allowed in ready status");
-/******/ 		options = options || {};
-/******/ 	
-/******/ 		var cb;
-/******/ 		var i;
-/******/ 		var j;
-/******/ 		var module;
-/******/ 		var moduleId;
-/******/ 	
-/******/ 		function getAffectedStuff(updateModuleId) {
-/******/ 			var outdatedModules = [updateModuleId];
-/******/ 			var outdatedDependencies = {};
-/******/ 	
-/******/ 			var queue = outdatedModules.slice().map(function(id) {
-/******/ 				return {
-/******/ 					chain: [id],
-/******/ 					id: id
-/******/ 				};
-/******/ 			});
-/******/ 			while(queue.length > 0) {
-/******/ 				var queueItem = queue.pop();
-/******/ 				var moduleId = queueItem.id;
-/******/ 				var chain = queueItem.chain;
-/******/ 				module = installedModules[moduleId];
-/******/ 				if(!module || module.hot._selfAccepted)
-/******/ 					continue;
-/******/ 				if(module.hot._selfDeclined) {
-/******/ 					return {
-/******/ 						type: "self-declined",
-/******/ 						chain: chain,
-/******/ 						moduleId: moduleId
-/******/ 					};
-/******/ 				}
-/******/ 				if(module.hot._main) {
-/******/ 					return {
-/******/ 						type: "unaccepted",
-/******/ 						chain: chain,
-/******/ 						moduleId: moduleId
-/******/ 					};
-/******/ 				}
-/******/ 				for(var i = 0; i < module.parents.length; i++) {
-/******/ 					var parentId = module.parents[i];
-/******/ 					var parent = installedModules[parentId];
-/******/ 					if(!parent) continue;
-/******/ 					if(parent.hot._declinedDependencies[moduleId]) {
-/******/ 						return {
-/******/ 							type: "declined",
-/******/ 							chain: chain.concat([parentId]),
-/******/ 							moduleId: moduleId,
-/******/ 							parentId: parentId
-/******/ 						};
-/******/ 					}
-/******/ 					if(outdatedModules.indexOf(parentId) >= 0) continue;
-/******/ 					if(parent.hot._acceptedDependencies[moduleId]) {
-/******/ 						if(!outdatedDependencies[parentId])
-/******/ 							outdatedDependencies[parentId] = [];
-/******/ 						addAllToSet(outdatedDependencies[parentId], [moduleId]);
-/******/ 						continue;
-/******/ 					}
-/******/ 					delete outdatedDependencies[parentId];
-/******/ 					outdatedModules.push(parentId);
-/******/ 					queue.push({
-/******/ 						chain: chain.concat([parentId]),
-/******/ 						id: parentId
-/******/ 					});
-/******/ 				}
-/******/ 			}
-/******/ 	
-/******/ 			return {
-/******/ 				type: "accepted",
-/******/ 				moduleId: updateModuleId,
-/******/ 				outdatedModules: outdatedModules,
-/******/ 				outdatedDependencies: outdatedDependencies
-/******/ 			};
-/******/ 		}
-/******/ 	
-/******/ 		function addAllToSet(a, b) {
-/******/ 			for(var i = 0; i < b.length; i++) {
-/******/ 				var item = b[i];
-/******/ 				if(a.indexOf(item) < 0)
-/******/ 					a.push(item);
-/******/ 			}
-/******/ 		}
-/******/ 	
-/******/ 		// at begin all updates modules are outdated
-/******/ 		// the "outdated" status can propagate to parents if they don't accept the children
-/******/ 		var outdatedDependencies = {};
-/******/ 		var outdatedModules = [];
-/******/ 		var appliedUpdate = {};
-/******/ 	
-/******/ 		var warnUnexpectedRequire = function warnUnexpectedRequire() {
-/******/ 			console.warn("[HMR] unexpected require(" + result.moduleId + ") to disposed module");
-/******/ 		};
-/******/ 	
-/******/ 		for(var id in hotUpdate) {
-/******/ 			if(Object.prototype.hasOwnProperty.call(hotUpdate, id)) {
-/******/ 				moduleId = toModuleId(id);
-/******/ 				var result;
-/******/ 				if(hotUpdate[id]) {
-/******/ 					result = getAffectedStuff(moduleId);
-/******/ 				} else {
-/******/ 					result = {
-/******/ 						type: "disposed",
-/******/ 						moduleId: id
-/******/ 					};
-/******/ 				}
-/******/ 				var abortError = false;
-/******/ 				var doApply = false;
-/******/ 				var doDispose = false;
-/******/ 				var chainInfo = "";
-/******/ 				if(result.chain) {
-/******/ 					chainInfo = "\nUpdate propagation: " + result.chain.join(" -> ");
-/******/ 				}
-/******/ 				switch(result.type) {
-/******/ 					case "self-declined":
-/******/ 						if(options.onDeclined)
-/******/ 							options.onDeclined(result);
-/******/ 						if(!options.ignoreDeclined)
-/******/ 							abortError = new Error("Aborted because of self decline: " + result.moduleId + chainInfo);
-/******/ 						break;
-/******/ 					case "declined":
-/******/ 						if(options.onDeclined)
-/******/ 							options.onDeclined(result);
-/******/ 						if(!options.ignoreDeclined)
-/******/ 							abortError = new Error("Aborted because of declined dependency: " + result.moduleId + " in " + result.parentId + chainInfo);
-/******/ 						break;
-/******/ 					case "unaccepted":
-/******/ 						if(options.onUnaccepted)
-/******/ 							options.onUnaccepted(result);
-/******/ 						if(!options.ignoreUnaccepted)
-/******/ 							abortError = new Error("Aborted because " + moduleId + " is not accepted" + chainInfo);
-/******/ 						break;
-/******/ 					case "accepted":
-/******/ 						if(options.onAccepted)
-/******/ 							options.onAccepted(result);
-/******/ 						doApply = true;
-/******/ 						break;
-/******/ 					case "disposed":
-/******/ 						if(options.onDisposed)
-/******/ 							options.onDisposed(result);
-/******/ 						doDispose = true;
-/******/ 						break;
-/******/ 					default:
-/******/ 						throw new Error("Unexception type " + result.type);
-/******/ 				}
-/******/ 				if(abortError) {
-/******/ 					hotSetStatus("abort");
-/******/ 					return Promise.reject(abortError);
-/******/ 				}
-/******/ 				if(doApply) {
-/******/ 					appliedUpdate[moduleId] = hotUpdate[moduleId];
-/******/ 					addAllToSet(outdatedModules, result.outdatedModules);
-/******/ 					for(moduleId in result.outdatedDependencies) {
-/******/ 						if(Object.prototype.hasOwnProperty.call(result.outdatedDependencies, moduleId)) {
-/******/ 							if(!outdatedDependencies[moduleId])
-/******/ 								outdatedDependencies[moduleId] = [];
-/******/ 							addAllToSet(outdatedDependencies[moduleId], result.outdatedDependencies[moduleId]);
-/******/ 						}
-/******/ 					}
-/******/ 				}
-/******/ 				if(doDispose) {
-/******/ 					addAllToSet(outdatedModules, [result.moduleId]);
-/******/ 					appliedUpdate[moduleId] = warnUnexpectedRequire;
-/******/ 				}
-/******/ 			}
-/******/ 		}
-/******/ 	
-/******/ 		// Store self accepted outdated modules to require them later by the module system
-/******/ 		var outdatedSelfAcceptedModules = [];
-/******/ 		for(i = 0; i < outdatedModules.length; i++) {
-/******/ 			moduleId = outdatedModules[i];
-/******/ 			if(installedModules[moduleId] && installedModules[moduleId].hot._selfAccepted)
-/******/ 				outdatedSelfAcceptedModules.push({
-/******/ 					module: moduleId,
-/******/ 					errorHandler: installedModules[moduleId].hot._selfAccepted
-/******/ 				});
-/******/ 		}
-/******/ 	
-/******/ 		// Now in "dispose" phase
-/******/ 		hotSetStatus("dispose");
-/******/ 		Object.keys(hotAvailableFilesMap).forEach(function(chunkId) {
-/******/ 			if(hotAvailableFilesMap[chunkId] === false) {
-/******/ 				hotDisposeChunk(chunkId);
-/******/ 			}
-/******/ 		});
-/******/ 	
-/******/ 		var idx;
-/******/ 		var queue = outdatedModules.slice();
-/******/ 		while(queue.length > 0) {
-/******/ 			moduleId = queue.pop();
-/******/ 			module = installedModules[moduleId];
-/******/ 			if(!module) continue;
-/******/ 	
-/******/ 			var data = {};
-/******/ 	
-/******/ 			// Call dispose handlers
-/******/ 			var disposeHandlers = module.hot._disposeHandlers;
-/******/ 			for(j = 0; j < disposeHandlers.length; j++) {
-/******/ 				cb = disposeHandlers[j];
-/******/ 				cb(data);
-/******/ 			}
-/******/ 			hotCurrentModuleData[moduleId] = data;
-/******/ 	
-/******/ 			// disable module (this disables requires from this module)
-/******/ 			module.hot.active = false;
-/******/ 	
-/******/ 			// remove module from cache
-/******/ 			delete installedModules[moduleId];
-/******/ 	
-/******/ 			// when disposing there is no need to call dispose handler
-/******/ 			delete outdatedDependencies[moduleId];
-/******/ 	
-/******/ 			// remove "parents" references from all children
-/******/ 			for(j = 0; j < module.children.length; j++) {
-/******/ 				var child = installedModules[module.children[j]];
-/******/ 				if(!child) continue;
-/******/ 				idx = child.parents.indexOf(moduleId);
-/******/ 				if(idx >= 0) {
-/******/ 					child.parents.splice(idx, 1);
-/******/ 				}
-/******/ 			}
-/******/ 		}
-/******/ 	
-/******/ 		// remove outdated dependency from module children
-/******/ 		var dependency;
-/******/ 		var moduleOutdatedDependencies;
-/******/ 		for(moduleId in outdatedDependencies) {
-/******/ 			if(Object.prototype.hasOwnProperty.call(outdatedDependencies, moduleId)) {
-/******/ 				module = installedModules[moduleId];
-/******/ 				if(module) {
-/******/ 					moduleOutdatedDependencies = outdatedDependencies[moduleId];
-/******/ 					for(j = 0; j < moduleOutdatedDependencies.length; j++) {
-/******/ 						dependency = moduleOutdatedDependencies[j];
-/******/ 						idx = module.children.indexOf(dependency);
-/******/ 						if(idx >= 0) module.children.splice(idx, 1);
-/******/ 					}
-/******/ 				}
-/******/ 			}
-/******/ 		}
-/******/ 	
-/******/ 		// Not in "apply" phase
-/******/ 		hotSetStatus("apply");
-/******/ 	
-/******/ 		hotCurrentHash = hotUpdateNewHash;
-/******/ 	
-/******/ 		// insert new code
-/******/ 		for(moduleId in appliedUpdate) {
-/******/ 			if(Object.prototype.hasOwnProperty.call(appliedUpdate, moduleId)) {
-/******/ 				modules[moduleId] = appliedUpdate[moduleId];
-/******/ 			}
-/******/ 		}
-/******/ 	
-/******/ 		// call accept handlers
-/******/ 		var error = null;
-/******/ 		for(moduleId in outdatedDependencies) {
-/******/ 			if(Object.prototype.hasOwnProperty.call(outdatedDependencies, moduleId)) {
-/******/ 				module = installedModules[moduleId];
-/******/ 				if(module) {
-/******/ 					moduleOutdatedDependencies = outdatedDependencies[moduleId];
-/******/ 					var callbacks = [];
-/******/ 					for(i = 0; i < moduleOutdatedDependencies.length; i++) {
-/******/ 						dependency = moduleOutdatedDependencies[i];
-/******/ 						cb = module.hot._acceptedDependencies[dependency];
-/******/ 						if(cb) {
-/******/ 							if(callbacks.indexOf(cb) >= 0) continue;
-/******/ 							callbacks.push(cb);
-/******/ 						}
-/******/ 					}
-/******/ 					for(i = 0; i < callbacks.length; i++) {
-/******/ 						cb = callbacks[i];
-/******/ 						try {
-/******/ 							cb(moduleOutdatedDependencies);
-/******/ 						} catch(err) {
-/******/ 							if(options.onErrored) {
-/******/ 								options.onErrored({
-/******/ 									type: "accept-errored",
-/******/ 									moduleId: moduleId,
-/******/ 									dependencyId: moduleOutdatedDependencies[i],
-/******/ 									error: err
-/******/ 								});
-/******/ 							}
-/******/ 							if(!options.ignoreErrored) {
-/******/ 								if(!error)
-/******/ 									error = err;
-/******/ 							}
-/******/ 						}
-/******/ 					}
-/******/ 				}
-/******/ 			}
-/******/ 		}
-/******/ 	
-/******/ 		// Load self accepted modules
-/******/ 		for(i = 0; i < outdatedSelfAcceptedModules.length; i++) {
-/******/ 			var item = outdatedSelfAcceptedModules[i];
-/******/ 			moduleId = item.module;
-/******/ 			hotCurrentParents = [moduleId];
-/******/ 			try {
-/******/ 				__webpack_require__(moduleId);
-/******/ 			} catch(err) {
-/******/ 				if(typeof item.errorHandler === "function") {
-/******/ 					try {
-/******/ 						item.errorHandler(err);
-/******/ 					} catch(err2) {
-/******/ 						if(options.onErrored) {
-/******/ 							options.onErrored({
-/******/ 								type: "self-accept-error-handler-errored",
-/******/ 								moduleId: moduleId,
-/******/ 								error: err2,
-/******/ 								orginalError: err, // TODO remove in webpack 4
-/******/ 								originalError: err
-/******/ 							});
-/******/ 						}
-/******/ 						if(!options.ignoreErrored) {
-/******/ 							if(!error)
-/******/ 								error = err2;
-/******/ 						}
-/******/ 						if(!error)
-/******/ 							error = err;
-/******/ 					}
-/******/ 				} else {
-/******/ 					if(options.onErrored) {
-/******/ 						options.onErrored({
-/******/ 							type: "self-accept-errored",
-/******/ 							moduleId: moduleId,
-/******/ 							error: err
-/******/ 						});
-/******/ 					}
-/******/ 					if(!options.ignoreErrored) {
-/******/ 						if(!error)
-/******/ 							error = err;
-/******/ 					}
-/******/ 				}
-/******/ 			}
-/******/ 		}
-/******/ 	
-/******/ 		// handle errors in accept handlers and self accepted module load
-/******/ 		if(error) {
-/******/ 			hotSetStatus("fail");
-/******/ 			return Promise.reject(error);
-/******/ 		}
-/******/ 	
-/******/ 		hotSetStatus("idle");
-/******/ 		return new Promise(function(resolve) {
-/******/ 			resolve(outdatedModules);
-/******/ 		});
-/******/ 	}
-/******/
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {},
-/******/ 			hot: hotCreateModule(moduleId),
-/******/ 			parents: (hotCurrentParentsTemp = hotCurrentParents, hotCurrentParents = [], hotCurrentParentsTemp),
-/******/ 			children: []
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, hotCreateRequire(moduleId));
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/ 	// __webpack_hash__
-/******/ 	__webpack_require__.h = function() { return hotCurrentHash; };
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return hotCreateRequire(13)(__webpack_require__.s = 13);
-/******/ })
-/************************************************************************/
-/******/ ([
+exports.id = 0;
+exports.modules = [
 /* 0 */
 /***/ (function(module, exports) {
 
@@ -720,21 +35,21 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.setDB = exports.app = undefined;
 
-var _express = __webpack_require__(8);
+var _express = __webpack_require__(7);
 
 var _express2 = _interopRequireDefault(_express);
 
-var _bodyParser = __webpack_require__(17);
+var _bodyParser = __webpack_require__(16);
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
 
-var _mongodb = __webpack_require__(7);
+var _mongodb = __webpack_require__(6);
 
-var _issue = __webpack_require__(18);
+var _issue = __webpack_require__(17);
 
 var _issue2 = _interopRequireDefault(_issue);
 
-var _renderedPageRouter = __webpack_require__(19);
+var _renderedPageRouter = __webpack_require__(18);
 
 var _renderedPageRouter2 = _interopRequireDefault(_renderedPageRouter);
 
@@ -758,11 +73,11 @@ app.use(_bodyParser2.default.json());
 let db;
 
 if (process.env.NODE_ENV !== 'production') {
-  const webpack = __webpack_require__(11);
-  const webpackDevMiddleware = __webpack_require__(32);
-  const webpackHotMiddleware = __webpack_require__(33);
+  const webpack = __webpack_require__(10);
+  const webpackDevMiddleware = __webpack_require__(31);
+  const webpackHotMiddleware = __webpack_require__(32);
 
-  const config = __webpack_require__(34);
+  const config = __webpack_require__(33);
   config.entry.app.push('webpack-hot-middleware/client', 'webpack/hot/only-dev-server');
   config.plugins.push(new webpack.HotModuleReplacementPlugin());
 
@@ -837,7 +152,7 @@ app.get('/api/issues', (req, res) => {
       } }]).toArray().then(results => {
       const stats = {};
       results.forEach(result => {
-        if (!stats[result._id.owner]) stats[result._id.owner] = {};
+        if (!stats[result._id.owner]) stats[results._id.owner] = {};
         stats[result._id.owner][result._id.status] = result.count;
       });
       res.json(stats);
@@ -924,7 +239,21 @@ exports.setDB = setDB;
 // });
 
 /***/ }),
-/* 5 */
+/* 5 */,
+/* 6 */,
+/* 7 */
+/***/ (function(module, exports) {
+
+module.exports = require("express");
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
+
+module.exports = require("react-router-bootstrap");
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -989,390 +318,24 @@ Toast.defaultProps = {
 };
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports) {
-
-module.exports = require("babel-polyfill");
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports) {
-
-module.exports = require("mongodb");
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports) {
-
-module.exports = require("express");
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports) {
-
-module.exports = require("react-router-bootstrap");
-
-/***/ }),
 /* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = __webpack_require__(1);
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _reactRouter = __webpack_require__(3);
-
-var _reactBootstrap = __webpack_require__(2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class IssueFilter extends _react2.default.Component {
-
-  constructor(props) {
-    super(props);
-    console.log(props);
-    this.state = {
-      status: props.initFilter.status || '',
-      effort_gte: props.initFilter.effort_gte || '',
-      effort_lte: props.initFilter.effort_lte || '',
-      changed: false
-    };
-    this.onChangeStatus = this.onChangeStatus.bind(this);
-    this.onChangeEffortGte = this.onChangeEffortGte.bind(this);
-    this.onChangeEffortLte = this.onChangeEffortLte.bind(this);
-    this.applyFilter = this.applyFilter.bind(this);
-    this.resetFilter = this.resetFilter.bind(this);
-    this.clearFilter = this.clearFilter.bind(this);
-  }
-
-  componentWillReceiveProps(newProps) {
-    this.setState({
-      status: newProps.initFilter.status || '',
-      effort_gte: this.props.initFilter.effort_gte || '',
-      effort_lte: this.props.initFilter.effort_lte || '',
-      changed: false
-    });
-  }
-  resetFilter() {
-    this.setState({
-      status: this.props.initFilter.status || '',
-      effort_lte: this.props.initFilter.effort_lte || '',
-      effort_gte: this.props.initFilter.effort_gte || '',
-      changed: false
-    });
-  }
-
-  setFilterOpen(e) {
-    e.preventDefault();
-    this.props.setFilter({ status: "open" });
-  }
-
-  setFilterAssigned(e) {
-    e.preventDefault();
-    this.props.setFilter({ status: 'assigned' });
-  }
-
-  clearFilter(e) {
-    e.preventDefault();
-    this.props.setFilter({});
-  }
-
-  onChangeStatus(e) {
-    this.setState({ status: e.target.value, changed: true });
-  }
-
-  onChangeEffortGte(e) {
-    const effortString = e.target.value;
-    if (effortString.match(/^\d*$/)) {
-      this.setState({ effort_gte: e.target.value, changed: true });
-    }
-  }
-
-  onChangeEffortLte(e) {
-    const effortString = e.target.value;
-    if (effortString.match(/^\d*$/)) {
-      this.setState({ effort_lte: e.target.value, changed: true });
-    }
-  }
-  applyFilter() {
-    const newFilter = {};
-    if (this.state.status) newFilter.status = this.state.status;
-    if (this.state.effort_gte) newFilter.effort_gte = this.state.effort_gte;
-    if (this.state.effort_lte) newFilter.effort_lte = this.state.effort_lte;
-    this.props.setFilter(newFilter);
-  }
-
-  clearFilter() {
-    this.props.setFilter({});
-  }
-
-  render() {
-    //  const Separator = () => <span> | </span>
-    return _react2.default.createElement(
-      _reactBootstrap.Row,
-      null,
-      _react2.default.createElement(
-        _reactBootstrap.Col,
-        { xs: 6, sm: 4, md: 3, lg: 2 },
-        _react2.default.createElement(
-          _reactBootstrap.FormGroup,
-          null,
-          _react2.default.createElement(
-            _reactBootstrap.ControlLabel,
-            null,
-            'Status '
-          ),
-          _react2.default.createElement(
-            _reactBootstrap.FormControl,
-            { componentClass: 'select', value: this.state.status, onChange: this.onChangeStatus },
-            _react2.default.createElement(
-              'option',
-              { value: '' },
-              ' (any) '
-            ),
-            _react2.default.createElement(
-              'option',
-              { value: 'New' },
-              'New '
-            ),
-            _react2.default.createElement(
-              'option',
-              { value: 'Open' },
-              ' Open '
-            ),
-            _react2.default.createElement(
-              'option',
-              { value: 'Assigned' },
-              'Assigned'
-            ),
-            _react2.default.createElement(
-              'option',
-              { value: 'Fixed' },
-              'Fixed '
-            ),
-            _react2.default.createElement(
-              'option',
-              { value: 'Verified' },
-              'Verified '
-            ),
-            _react2.default.createElement(
-              'option',
-              { value: 'Closed' },
-              'Closed '
-            )
-          )
-        )
-      ),
-      _react2.default.createElement(
-        _reactBootstrap.Col,
-        { xs: 6, sm: 4, md: 3, lg: 2 },
-        _react2.default.createElement(
-          _reactBootstrap.FormGroup,
-          null,
-          _react2.default.createElement(
-            _reactBootstrap.ControlLabel,
-            null,
-            ' Effort '
-          ),
-          _react2.default.createElement(
-            _reactBootstrap.InputGroup,
-            null,
-            _react2.default.createElement(_reactBootstrap.FormControl, { value: this.state.effort_gte, onChange: this.onChangeEffortGte }),
-            _react2.default.createElement(
-              _reactBootstrap.InputGroup.Addon,
-              null,
-              '-'
-            ),
-            _react2.default.createElement(_reactBootstrap.FormControl, { value: this.state.effort_lte, onChange: this.onChangeEffortLte })
-          )
-        )
-      ),
-      _react2.default.createElement(
-        _reactBootstrap.Col,
-        { xs: 6, sm: 4, md: 4, lg: 3 },
-        _react2.default.createElement(
-          _reactBootstrap.FormGroup,
-          null,
-          _react2.default.createElement(
-            _reactBootstrap.ControlLabel,
-            null,
-            '&npsp; '
-          ),
-          _react2.default.createElement(
-            _reactBootstrap.ButtonToolbar,
-            null,
-            _react2.default.createElement(
-              _reactBootstrap.Button,
-              { bsStyle: 'primary', onClick: this.applyFilter },
-              ' Apply '
-            ),
-            _react2.default.createElement(
-              _reactBootstrap.Button,
-              { onClick: this.resetFilter, disabled: !this.state.changed },
-              ' Reset '
-            ),
-            _react2.default.createElement(
-              _reactBootstrap.Button,
-              { onClick: this.clearFilter },
-              ' Clear '
-            )
-          )
-        )
-      )
-    );
-  }
-}
-
-exports.default = IssueFilter;
-IssueFilter.propTypes = {
-  setFilter: _propTypes2.default.func.isRequired,
-  initFilter: _propTypes2.default.object
-};
-
-/***/ }),
-/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = require("webpack");
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports) {
-
-var logLevel = "info";
-
-function dummy() {}
-
-function shouldLog(level) {
-	var shouldLog = (logLevel === "info" && level === "info") ||
-		(["info", "warning"].indexOf(logLevel) >= 0 && level === "warning") ||
-		(["info", "warning", "error"].indexOf(logLevel) >= 0 && level === "error");
-	return shouldLog;
-}
-
-function logGroup(logFn) {
-	return function(level, msg) {
-		if(shouldLog(level)) {
-			logFn(msg);
-		}
-	};
-}
-
-module.exports = function(level, msg) {
-	if(shouldLog(level)) {
-		if(level === "info") {
-			console.log(msg);
-		} else if(level === "warning") {
-			console.warn(msg);
-		} else if(level === "error") {
-			console.error(msg);
-		}
-	}
-};
-
-var group = console.group || dummy;
-var groupCollapsed = console.groupCollapsed || dummy;
-var groupEnd = console.groupEnd || dummy;
-
-module.exports.group = logGroup(group);
-
-module.exports.groupCollapsed = logGroup(groupCollapsed);
-
-module.exports.groupEnd = logGroup(groupEnd);
-
-module.exports.setLogLevel = function(level) {
-	logLevel = level;
-};
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(14);
-module.exports = __webpack_require__(35);
-
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _sourceMapSupport = __webpack_require__(15);
-
-var _sourceMapSupport2 = _interopRequireDefault(_sourceMapSupport);
-
-__webpack_require__(6);
-
-var _http = __webpack_require__(16);
-
-var _http2 = _interopRequireDefault(_http);
-
-var _mongodb = __webpack_require__(7);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-_sourceMapSupport2.default.install();
-
-
-let appModule = __webpack_require__(4);
-let db;
-let server;
-
-_mongodb.MongoClient.connect('mongodb://localhost/issuetracker').then(connection => {
-  db = connection;
-  server = _http2.default.createServer();
-  appModule.setDB(db);
-  server.on('request', appModule.app);
-  server.listen(3000, () => {
-    console.log("App started on port 3000");
-  });
-}).catch(error => {
-  console.log('Error : ', error);
-});
-
-if (true) {
-  module.hot.accept(4, () => {
-    server.removeListener('request', appModule.app);
-    appModule = __webpack_require__(4); //eslinit-disable-line
-    appModule.setDB(db);
-    server.on('request', appModule.app);
-  });
-}
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports) {
-
-module.exports = require("source-map-support");
-
-/***/ }),
+/* 11 */,
+/* 12 */,
+/* 13 */,
+/* 14 */,
+/* 15 */,
 /* 16 */
-/***/ (function(module, exports) {
-
-module.exports = require("http");
-
-/***/ }),
-/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = require("body-parser");
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1436,7 +399,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1450,23 +413,23 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _server = __webpack_require__(20);
+var _server = __webpack_require__(19);
 
 var _reactRouter = __webpack_require__(3);
 
-var _express = __webpack_require__(8);
+var _express = __webpack_require__(7);
 
 var _express2 = _interopRequireDefault(_express);
 
-var _template = __webpack_require__(21);
+var _template = __webpack_require__(20);
 
 var _template2 = _interopRequireDefault(_template);
 
-var _Routes = __webpack_require__(22);
+var _Routes = __webpack_require__(21);
 
 var _Routes2 = _interopRequireDefault(_Routes);
 
-var _ContextWrapper = __webpack_require__(31);
+var _ContextWrapper = __webpack_require__(30);
 
 var _ContextWrapper2 = _interopRequireDefault(_ContextWrapper);
 
@@ -1518,13 +481,13 @@ renderedPageRouter.get('*', (req, res) => {
 exports.default = renderedPageRouter;
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports) {
 
 module.exports = require("react-dom/server.js");
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1560,7 +523,7 @@ function template(body, initialState) {
 }
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1576,21 +539,17 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactRouter = __webpack_require__(3);
 
-var _App = __webpack_require__(23);
+var _App = __webpack_require__(22);
 
 var _App2 = _interopRequireDefault(_App);
 
-var _IssueList = __webpack_require__(24);
+var _IssueList = __webpack_require__(23);
 
 var _IssueList2 = _interopRequireDefault(_IssueList);
 
 var _IssueEdit = __webpack_require__(27);
 
 var _IssueEdit2 = _interopRequireDefault(_IssueEdit);
-
-var _IssueReport = __webpack_require__(30);
-
-var _IssueReport2 = _interopRequireDefault(_IssueReport);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1605,12 +564,11 @@ exports.default = _react2.default.createElement(
   { path: '/', component: _App2.default },
   _react2.default.createElement(_reactRouter.Route, { path: 'issues', component: (0, _reactRouter.withRouter)(_IssueList2.default) }),
   _react2.default.createElement(_reactRouter.Route, { path: 'issues/:id', component: _IssueEdit2.default }),
-  _react2.default.createElement(_reactRouter.Route, { path: 'reports', component: (0, _reactRouter.withRouter)(_IssueReport2.default) }),
   _react2.default.createElement(_reactRouter.Route, { path: '*', component: NoMatch })
 );
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1620,7 +578,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-__webpack_require__(6);
+__webpack_require__(5);
 
 var _react = __webpack_require__(0);
 
@@ -1632,7 +590,7 @@ var _propTypes2 = _interopRequireDefault(_propTypes);
 
 var _reactBootstrap = __webpack_require__(2);
 
-var _reactRouterBootstrap = __webpack_require__(9);
+var _reactRouterBootstrap = __webpack_require__(8);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1750,7 +708,7 @@ App.propTypes = {
 exports.default = App;
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1764,7 +722,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-__webpack_require__(25);
+__webpack_require__(24);
 
 var _propTypes = __webpack_require__(1);
 
@@ -1774,15 +732,15 @@ var _reactRouter = __webpack_require__(3);
 
 var _reactBootstrap = __webpack_require__(2);
 
-var _IssueAdd = __webpack_require__(26);
+var _IssueAdd = __webpack_require__(25);
 
 var _IssueAdd2 = _interopRequireDefault(_IssueAdd);
 
-var _IssueFilter = __webpack_require__(10);
+var _IssueFilter = __webpack_require__(26);
 
 var _IssueFilter2 = _interopRequireDefault(_IssueFilter);
 
-var _Toast = __webpack_require__(5);
+var _Toast = __webpack_require__(9);
 
 var _Toast2 = _interopRequireDefault(_Toast);
 
@@ -2079,13 +1037,13 @@ IssueList.propTypes = {
 exports.default = IssueList;
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = require("isomorphic-fetch");
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2146,6 +1104,234 @@ class IssueAdd extends _react2.default.Component {
 exports.default = IssueAdd;
 
 /***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(1);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _reactRouter = __webpack_require__(3);
+
+var _reactBootstrap = __webpack_require__(2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class IssueFilter extends _react2.default.Component {
+
+  constructor(props) {
+    super(props);
+    console.log(props);
+    this.state = {
+      status: props.initFilter.status || '',
+      effort_gte: props.initFilter.effort_gte || '',
+      effort_lte: props.initFilter.effort_lte || '',
+      changed: false
+    };
+    this.onChangeStatus = this.onChangeStatus.bind(this);
+    this.onChangeEffortGte = this.onChangeEffortGte.bind(this);
+    this.onChangeEffortLte = this.onChangeEffortLte.bind(this);
+    this.applyFilter = this.applyFilter.bind(this);
+    this.resetFilter = this.resetFilter.bind(this);
+    this.clearFilter = this.clearFilter.bind(this);
+  }
+
+  componentWillReceiveProps(newProps) {
+    this.setState({
+      status: newProps.initFilter.status || '',
+      effort_gte: this.props.initFilter.effort_gte || '',
+      effort_lte: this.props.initFilter.effort_lte || '',
+      changed: false
+    });
+  }
+  resetFilter() {
+    this.setState({
+      status: this.props.initFilter.status || '',
+      effort_lte: this.props.initFilter.effort_lte || '',
+      effort_gte: this.props.initFilter.effort_gte || '',
+      changed: false
+    });
+  }
+
+  setFilterOpen(e) {
+    e.preventDefault();
+    this.props.setFilter({ status: "open" });
+  }
+
+  setFilterAssigned(e) {
+    e.preventDefault();
+    this.props.setFilter({ status: 'assigned' });
+  }
+
+  clearFilter(e) {
+    e.preventDefault();
+    this.props.setFilter({});
+  }
+
+  onChangeStatus(e) {
+    this.setState({ status: e.target.value, changed: true });
+  }
+
+  onChangeEffortGte(e) {
+    const effortString = e.target.value;
+    if (effortString.match(/^\d*$/)) {
+      this.setState({ effort_gte: e.target.value, changed: true });
+    }
+  }
+
+  onChangeEffortLte(e) {
+    const effortString = e.target.value;
+    if (effortString.match(/^\d*$/)) {
+      this.setState({ effort_lte: e.target.value, changed: true });
+    }
+  }
+  applyFilter() {
+    const newFilter = {};
+    if (this.state.status) newFilter.status = this.state.status;
+    if (this.state.effort_gte) newFilter.effort_gte = this.state.effort_gte;
+    if (this.state.effort_lte) newFilter.effort_lte = this.state.effort_lte;
+    this.props.setFilter(newFilter);
+  }
+
+  clearFilter() {
+    this.props.setFilter({});
+  }
+
+  render() {
+    //  const Separator = () => <span> | </span>
+    return _react2.default.createElement(
+      _reactBootstrap.Row,
+      null,
+      _react2.default.createElement(
+        _reactBootstrap.Col,
+        { xs: 6, sm: 4, md: 3, lg: 2 },
+        _react2.default.createElement(
+          _reactBootstrap.FormGroup,
+          null,
+          _react2.default.createElement(
+            _reactBootstrap.ControlLabel,
+            null,
+            'Status '
+          ),
+          _react2.default.createElement(
+            _reactBootstrap.FormControl,
+            { componentClass: 'select', value: this.state.status, onChange: this.onChangeStatus },
+            _react2.default.createElement(
+              'option',
+              { value: '' },
+              ' (any) '
+            ),
+            _react2.default.createElement(
+              'option',
+              { value: 'New' },
+              'New '
+            ),
+            _react2.default.createElement(
+              'option',
+              { value: 'Open' },
+              ' Open '
+            ),
+            _react2.default.createElement(
+              'option',
+              { value: 'Assigned' },
+              'Assigned'
+            ),
+            _react2.default.createElement(
+              'option',
+              { value: 'Fixed' },
+              'Fixed '
+            ),
+            _react2.default.createElement(
+              'option',
+              { value: 'Verified' },
+              'Verified '
+            ),
+            _react2.default.createElement(
+              'option',
+              { value: 'Closed' },
+              'Closed '
+            )
+          )
+        )
+      ),
+      _react2.default.createElement(
+        _reactBootstrap.Col,
+        { xs: 6, sm: 4, md: 3, lg: 2 },
+        _react2.default.createElement(
+          _reactBootstrap.FormGroup,
+          null,
+          _react2.default.createElement(
+            _reactBootstrap.ControlLabel,
+            null,
+            ' Effort '
+          ),
+          _react2.default.createElement(
+            _reactBootstrap.InputGroup,
+            null,
+            _react2.default.createElement(_reactBootstrap.FormControl, { value: this.state.effort_gte, onChange: this.onChangeEffortGte }),
+            _react2.default.createElement(
+              _reactBootstrap.InputGroup.Addon,
+              null,
+              '-'
+            ),
+            _react2.default.createElement(_reactBootstrap.FormControl, { value: this.state.effort_lte, onChange: this.onChangeEffortLte })
+          )
+        )
+      ),
+      _react2.default.createElement(
+        _reactBootstrap.Col,
+        { xs: 6, sm: 4, md: 4, lg: 3 },
+        _react2.default.createElement(
+          _reactBootstrap.FormGroup,
+          null,
+          _react2.default.createElement(
+            _reactBootstrap.ControlLabel,
+            null,
+            '&npsp; '
+          ),
+          _react2.default.createElement(
+            _reactBootstrap.ButtonToolbar,
+            null,
+            _react2.default.createElement(
+              _reactBootstrap.Button,
+              { bsStyle: 'primary', onClick: this.applyFilter },
+              ' Apply '
+            ),
+            _react2.default.createElement(
+              _reactBootstrap.Button,
+              { onClick: this.resetFilter, disabled: !this.state.changed },
+              ' Reset '
+            ),
+            _react2.default.createElement(
+              _reactBootstrap.Button,
+              { onClick: this.clearFilter },
+              ' Clear '
+            )
+          )
+        )
+      )
+    );
+  }
+}
+
+exports.default = IssueFilter;
+IssueFilter.propTypes = {
+  setFilter: _propTypes2.default.func.isRequired,
+  initFilter: _propTypes2.default.object
+};
+
+/***/ }),
 /* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2166,7 +1352,7 @@ var _propTypes2 = _interopRequireDefault(_propTypes);
 
 var _reactRouter = __webpack_require__(3);
 
-var _reactRouterBootstrap = __webpack_require__(9);
+var _reactRouterBootstrap = __webpack_require__(8);
 
 var _reactBootstrap = __webpack_require__(2);
 
@@ -2178,7 +1364,7 @@ var _DateInput = __webpack_require__(29);
 
 var _DateInput2 = _interopRequireDefault(_DateInput);
 
-var _Toast = __webpack_require__(5);
+var _Toast = __webpack_require__(9);
 
 var _Toast2 = _interopRequireDefault(_Toast);
 
@@ -2717,167 +1903,6 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactBootstrap = __webpack_require__(2);
-
-var _propTypes = __webpack_require__(1);
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _IssueFilter = __webpack_require__(10);
-
-var _IssueFilter2 = _interopRequireDefault(_IssueFilter);
-
-var _Toast = __webpack_require__(5);
-
-var _Toast2 = _interopRequireDefault(_Toast);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const statuses = ['New', 'Open', 'Assigned', 'Fixed', 'Verified', 'Closed'];
-
-const StatRow = props => _react2.default.createElement(
-  'tr',
-  null,
-  _react2.default.createElement(
-    'td',
-    null,
-    props.owner
-  ),
-  statuses.map((status, index) => _react2.default.createElement(
-    'td',
-    { key: index },
-    props.counts[status]
-  ))
-);
-
-StatRow.propTypes = {
-  owner: _propTypes2.default.string.isRequired,
-  counts: _propTypes2.default.object.isRequired
-};
-
-class IssueReport extends _react2.default.Component {
-  static dataFetcher(_ref) {
-    let urlBase = _ref.urlBase,
-        location = _ref.location;
-
-    const search = location.search ? `${location.search}&_summary` : '?_summary';
-    return fetch(`${urlBase || ''}/api/issues/${search}`).then(response => {
-      if (!response.ok) return response.json().then(error => Promise.reject(error));
-      return response.json().then(data => ({ IssueReport: data }));
-    });
-  }
-
-  constructor(props, context) {
-    super(props, context);
-    console.log("the context is : ", this.context);
-    const stats = context.initialState.IssueReport ? context.initialState.IssueReport : {};
-    this.state = {
-      stats: stats,
-      toastVisible: false, toastMessage: '', toastType: 'Success'
-    };
-    this.setFilter = this.setFilter.bind(this);
-    this.showError = this.showError.bind(this);
-    this.dismissToast = this.dismissToast.bind(this);
-  }
-
-  componentDidMound() {
-    this.loadData();
-  }
-
-  componentDidUpdate(prevProps) {
-    const oldQuery = prevProps.location.query;
-    const newQuery = this.props.location.query;
-
-    if (oldQuery.status === newQuery.status && oldQuery.effort_gte === newQuery.effort_gte && oldQuery.effort_lte == newQuery.effort_lte) {
-      return;
-    }
-    this.loadData();
-  }
-
-  setFilter(query) {
-    this.props.router.push({ pathname: this.props.location.pathname, query: query });
-  }
-
-  showError(message) {
-    this.setState({ toastVisible: true, toastMessage: message, toastType: 'danger' });
-  }
-
-  dismissToast() {
-    this.setState({ toastVisible: false });
-  }
-
-  loadData() {
-    IssueReport.dataFetcher({ location: this.props.location }).then(data => {
-      this.setState({ stats: data.IssueReport });
-    }).catch(err => {
-      this.showError(`Error in fetching data from server : ${error}`);
-    });
-  }
-
-  render() {
-    return _react2.default.createElement(
-      'div',
-      null,
-      _react2.default.createElement(
-        _reactBootstrap.Panel,
-        { collapsible: true, header: 'Filter' },
-        _react2.default.createElement('issueFilter', { setFilter: this.setFilter, initFilter: this.props.location.query })
-      ),
-      _react2.default.createElement(
-        _reactBootstrap.Table,
-        { bordered: true, condensed: true, hover: true, responsive: true },
-        _react2.default.createElement(
-          'thead',
-          null,
-          _react2.default.createElement(
-            'tr',
-            null,
-            _react2.default.createElement('th', null),
-            statuses.map((status, index) => _react2.default.createElement(
-              'td',
-              { key: index },
-              ' ',
-              status
-            ))
-          )
-        ),
-        _react2.default.createElement(
-          'tbody',
-          null,
-          Object.keys(this.state.stats).map((owner, index) => _react2.default.createElement(StatRow, { key: index, owner: owner, counts: this.state.stats[owner] }))
-        )
-      ),
-      _react2.default.createElement(_Toast2.default, { showing: this.state.toastVisible, message: this.state.toastMessage,
-        onDismiss: this.dismissToast, bsStyle: this.state.toastType })
-    );
-  }
-}
-
-exports.default = IssueReport;
-IssueReport.propTypes = {
-  location: _propTypes2.default.object.isRequired,
-  router: _propTypes2.default.object
-};
-
-IssueReport.contextTypes = {
-  initialState: _propTypes2.default.object
-};
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
 var _propTypes = __webpack_require__(1);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
@@ -2905,25 +1930,25 @@ ContextWrapper.propTypes = {
 };
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports) {
 
 module.exports = require("webpack-dev-middleware");
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports) {
 
 module.exports = require("webpack-hot-middleware");
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(__dirname) {
 
-const webpack = __webpack_require__(11);
+const webpack = __webpack_require__(10);
 
 module.exports = {
   entry: {
@@ -2959,91 +1984,6 @@ module.exports = {
 };
 /* WEBPACK VAR INJECTION */}.call(exports, "/"))
 
-/***/ }),
-/* 35 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(__resourceQuery) {/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-/*globals __resourceQuery */
-if(true) {
-	var hotPollInterval = +(__resourceQuery.substr(1)) || (10 * 60 * 1000);
-	var log = __webpack_require__(12);
-
-	var checkForUpdate = function checkForUpdate(fromUpdate) {
-		if(module.hot.status() === "idle") {
-			module.hot.check(true).then(function(updatedModules) {
-				if(!updatedModules) {
-					if(fromUpdate) log("info", "[HMR] Update applied.");
-					return;
-				}
-				__webpack_require__(36)(updatedModules, updatedModules);
-				checkForUpdate(true);
-			}).catch(function(err) {
-				var status = module.hot.status();
-				if(["abort", "fail"].indexOf(status) >= 0) {
-					log("warning", "[HMR] Cannot apply update.");
-					log("warning", "[HMR] " + err.stack || err.message);
-					log("warning", "[HMR] You need to restart the application!");
-				} else {
-					log("warning", "[HMR] Update failed: " + err.stack || err.message);
-				}
-			});
-		}
-	};
-	setInterval(checkForUpdate, hotPollInterval);
-} else {
-	throw new Error("[HMR] Hot Module Replacement is disabled.");
-}
-
-/* WEBPACK VAR INJECTION */}.call(exports, "?1000"))
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-module.exports = function(updatedModules, renewedModules) {
-	var unacceptedModules = updatedModules.filter(function(moduleId) {
-		return renewedModules && renewedModules.indexOf(moduleId) < 0;
-	});
-	var log = __webpack_require__(12);
-
-	if(unacceptedModules.length > 0) {
-		log("warning", "[HMR] The following modules couldn't be hot updated: (They would need a full reload!)");
-		unacceptedModules.forEach(function(moduleId) {
-			log("warning", "[HMR]  - " + moduleId);
-		});
-	}
-
-	if(!renewedModules || renewedModules.length === 0) {
-		log("info", "[HMR] Nothing hot updated.");
-	} else {
-		log("info", "[HMR] Updated modules:");
-		renewedModules.forEach(function(moduleId) {
-			if(typeof moduleId === "string" && moduleId.indexOf("!") !== -1) {
-				var parts = moduleId.split("!");
-				log.groupCollapsed("info", "[HMR]  - " + parts.pop());
-				log("info", "[HMR]  - " + moduleId);
-				log.groupEnd("info");
-			} else {
-				log("info", "[HMR]  - " + moduleId);
-			}
-		});
-		var numberIds = renewedModules.every(function(moduleId) {
-			return typeof moduleId === "number";
-		});
-		if(numberIds)
-			log("info", "[HMR] Consider using the NamedModulesPlugin for module names.");
-	}
-};
-
-
 /***/ })
-/******/ ])));
-//# sourceMappingURL=server.bundle.js.map
+];
+//# sourceMappingURL=0.81471abff4e4be45e72d.hot-update.js.map

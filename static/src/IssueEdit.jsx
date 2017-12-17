@@ -9,7 +9,7 @@ import NumInput from './NumInput.jsx';
 import DateInput from './DateInput.jsx';
 import Toast from './Toast.jsx';
 
-export default class IssueEdit extends React.Component { // eslint-disable-line
+class IssueEdit extends React.Component { // eslint-disable-line
 static dataFetcher({params, urlBase}){
   return fetch(`${urlBase ||''}/api/issues/${params.id}`).then(response=>{
     if(!response.ok) return response.json().then(error=>Promise.reject(error));
@@ -24,7 +24,7 @@ constructor(props, context){
   // issue.completionDate = issue.completionDate != null ? new Date(issue.completionDate) : null;
 
   let issue;
-  if(context.initialState.IssueEdit){
+  if(context.initialState && context.initialState.IssueEdit){
     issue = context.initialState.IssueEdit;
     issue.created = new Date(issue.created);
     issue.completionDate = issue.completionDate != null ? new Date(issue.completionDate) : null;
@@ -34,7 +34,7 @@ constructor(props, context){
       _id : '',
       title: '',
       owner: '',
-      effort: '',
+      effort: null,
       completionDate: null,
       created: null,
     };
@@ -149,7 +149,7 @@ loadData(){
   // });
 
   IssueEdit.dataFetcher({params: this.props.params}).then(data=>{
-    const issue = data.IssueList;
+    const issue = data.IssueEdit;
     issue.created = new Date(issue.created);
     issue.completionDate =issue.completionDate != null ? new Date(issue.completionDate) : null;
     this.setState({issue});
@@ -220,7 +220,7 @@ dismissToast(){
           <FormGroup validationState={this.state.invalidFields.completionDate ? 'error' : null}>
             <Col componentClass={ControlLabel} sm={3}> Completion Date </Col>
             <Col sm={9}>
-              <FormControl componentClass={DateInput} name="completionDate"  value={issue.completionDate}
+              <FormControl componentClass={DateInput} name="completionDate"  value={this.state.issue.completionDate}
                 onChange={this.onChange} onValidityChange={this.onValidityChange} />
                 <FormControl.Feedback />
             </Col>
@@ -284,3 +284,5 @@ IssueEdit.contextTypes = {
 IssueEdit.PropTypes = {
   params: PropTypes.object.isRequired,
 };
+
+export default IssueEdit;

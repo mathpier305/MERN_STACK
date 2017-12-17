@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 export default class DateInput extends React.Component{
   constructor(props){
     super(props);
-    console.log(props.value);
-    console.log(typeof props.value);
+  //  console.log(props.value);
+//    console.log(typeof props.value);
 
     this.state = { value: this.editFormat(props.value),
                   focused: false, valid: true};

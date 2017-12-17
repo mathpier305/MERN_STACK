@@ -66,7 +66,7 @@ IssueTable.propTypes = {
 
 
 
-export default class IssueList extends React.Component {
+class IssueList extends React.Component {
 
   static dataFetcher({urlBase, location}){
   return fetch(`${urlBase,'' }/api/issues${location.search}`)
@@ -80,7 +80,7 @@ export default class IssueList extends React.Component {
   constructor(props, context) {
     super(props, context);
   //  const issues = context.initialState.data.records;
-  const issues = context.initialState.IssueList ? context.initialState.IssueList.records : [];
+  const issues = context.initialState && context.initialState.IssueList ? context.initialState.IssueList.records : [];
 
     issues.forEach(issue=>{
       issue.created = new Date(issue.created);
@@ -221,7 +221,6 @@ export default class IssueList extends React.Component {
     );
   }
 }
-//export default withRouter(IssueList);
 
 IssueList.contextTypes = {
   initialState: PropTypes.object,
@@ -231,3 +230,5 @@ IssueList.propTypes = {
   location: PropTypes.object.isRequired,
   router: PropTypes.object,
 };
+
+export default IssueList;
