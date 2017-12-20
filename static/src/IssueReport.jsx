@@ -21,18 +21,11 @@ StatRow.propTypes = {
 
 
 export default class IssueReport extends React.Component{
-  static dataFetcher({urlBase, location}){
-    const search = location.search ? `${location.search}&_summary` : '?_summary';
-    return fetch(`${urlBase || ''}/api/issues/${search}`).then(response=>{
-      if(!response.ok) return  response.json().then(error=>Promise.reject(error));
-      return response.json().then(data=>({IssueReport: data}));
-    });
-  }
-
   constructor(props, context){
     super(props, context);
+    console.log('contexL: ', context);
     console.log("the context is : ", this.context);
-    const stats = context.initialState.IssueReport ? context.initialState.IssueReport : {};
+    const stats = context.initialState ? context.initialState.IssueReport : {};
     this.state = {
       stats,
       toastVisible: false, toastMessage: '', toastType: 'Success',
@@ -40,6 +33,15 @@ export default class IssueReport extends React.Component{
     this.setFilter = this.setFilter.bind(this);
     this.showError = this.showError.bind(this);
     this.dismissToast = this.dismissToast.bind(this);
+  }
+
+  static dataFetcher({urlBase, location}){
+    const search = location.search ? `${location.search}&_summary` : '?_summary';
+    return fetch(`${urlBase || ''}/api/issues/${search}`).then(response=>{
+      console.log("the response is : ", response);
+      if(!response.ok) return  response.json().then(error=>Promise.reject(error));
+      return response.json().then(data=>({IssueReport: data}));
+    });
   }
 
   componentDidMound(){

@@ -20,7 +20,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "7c603e8c856adef1eac9"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "2bea351bb534b82ed58d"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -820,10 +820,16 @@ app.get('/api/issues', (req, res) => {
   if (req.query.effort_lte || req.query.effort_gte) filter.effort = {};
   if (req.query.effort_lte) filter.effort.$lte = parseInt(req.query.effort_lte, 10);
   if (req.query.effort_gte) filter.effort.$gte = parseInt(req.query.effort_gte, 10);
-  if (req.query._summary == undefined) {
+  if (req.query._summary === undefined) {
+    const offset = req.query._offset ? parseInt(req.query._offset, 10) : 0;
     let limit = req.query.limit ? parseInt(req.query._limit, 10) : 20;
     if (limit > 50) limit = 50;
-    db.collection('issues').find(filter).toArray().then(issues => {
+    const cursor = db.collection('issues').find(filter).sort({ _id: 1 }).skip(offset).limit(limit);
+    let totalCount;
+    cursor.count(false).then(result => {
+      totalCount = result;
+      return cursor.toArray();
+    }).then(issues => {
       const metadata = { total_count: issues.length };
       res.json({ metadata: metadata, records: issues });
       console.log("request");
@@ -1788,6 +1794,8 @@ var _Toast2 = _interopRequireDefault(_Toast);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+const PAGE_SIZE = 10;
+
 const IssueRow = props => {
   function onDeleteClick() {
     props.deleteIssue(props.issue._id);
@@ -1921,7 +1929,15 @@ class IssueList extends _react2.default.Component {
     let urlBase = _ref.urlBase,
         location = _ref.location;
 
-    return fetch(`${(urlBase, '')}/api/issues${location.search}`).then(response => {
+    const query = Object.assign({}, location.query);
+    const pageStr = query._page;
+    if (pageStr) {
+      delete query._page;
+      query._offset = (parseInt(pageStr, 10) - 1) * PAGE_SIZE;
+    }
+    query._limit = PAGE_SIZE;
+    const search = Object.keys(query).map(k => `${k}=${query[k]}`).join('&');
+    return fetch(`${urlBase || ''}/api/issues?${search}`).then(response => {
       if (!response.ok) return response.json().then(error => Promise.reject(error));
       return response.json().then(data => ({ IssueList: data }));
     });
@@ -1929,8 +1945,10 @@ class IssueList extends _react2.default.Component {
 
   constructor(props, context) {
     super(props, context);
-    //  const issues = context.initialState.data.records;
-    const issues = context.initialState && context.initialState.IssueList ? context.initialState.IssueList.records : [];
+    //const issues = context.initialState.data.records;
+    //const issues = context.initialState && context.initialState.IssueList ? context.initialState.IssueList.records : [];
+    const data = context.initialState.IssueList ? context.initialState.IssueList : { metadata: { totalCount: 0 }, records: [] };
+    const issues = data.records;
 
     issues.forEach(issue => {
       issue.created = new Date(issue.created);
@@ -1939,8 +1957,11 @@ class IssueList extends _react2.default.Component {
       }
     });
     this.state = { issues: issues, toastVisible: false,
-      toastMessage: '', toastType: 'success' };
+      toastMessage: '', toastType: 'success',
+      totalCount: data.metadata.totalCount
+    };
 
+    this.selectPage = this.selectPage.bind(this);
     this.createIssue = this.createIssue.bind(this);
     this.setFilter = this.setFilter.bind(this);
     this.deleteIssue = this.deleteIssue.bind(this);
@@ -1982,11 +2003,16 @@ class IssueList extends _react2.default.Component {
       return;
     }
 
-    if (oldQuery.status == newQuery.status && oldQuery.effort_gte === newQuery.effort_gte && oldQuery.effort_lte === newQuery.effort_lte) {
+    if (oldQuery.status == newQuery.status && oldQuery.effort_gte === newQuery.effort_gte && oldQuery.effort_lte === newQuery.effort_lte && oldQuery._page === newQuery._page) {
       return;
     }
 
     this.loadData();
+  }
+
+  selectPage() {
+    const query = Object.assign(this.props.location.query, { _page: eventkey });
+    this.props.router.push({ pathname: this.props.location.pathname, query: query });
   }
 
   loadData() {
@@ -2018,7 +2044,8 @@ class IssueList extends _react2.default.Component {
           issue.completionDate = new Date(issue.completionDate);
         }
       });
-      this.setState({ issues: issues });
+      this.setState({ issues: issues, totalCount: data.IssueList.metadata.totalCount });
+      console.log('satet:', issues);
     }).catch(err => {
       this.showError(`Error in fetching data from server: ${err}`);
     });
@@ -2050,6 +2077,7 @@ class IssueList extends _react2.default.Component {
   }
 
   render() {
+    console.log("issueList : ", this.state);
     return _react2.default.createElement(
       'div',
       null,
@@ -2059,6 +2087,11 @@ class IssueList extends _react2.default.Component {
         _react2.default.createElement(_IssueFilter2.default, { setFilter: this.setFilter,
           initFilter: this.props.location.query })
       ),
+      _react2.default.createElement(_reactBootstrap.Pagination, {
+
+        items: Math.ceil(this.state.totalCount / PAGE_SIZE),
+        activePage: parseInt(this.props.location.query._page || '1', 10),
+        onSelect: this.selectPage, maxButton: 7, next: true, prev: true, boundaryLinks: true }),
       _react2.default.createElement(IssueTable, { issues: this.state.issues, deleteIssue: this.deleteIssue }),
       _react2.default.createElement(_IssueAdd2.default, { createIssue: this.createIssue }),
       _react2.default.createElement(_Toast2.default, { showing: this.state.toastVisible, message: this.state.toastMessage,
@@ -2756,21 +2789,11 @@ StatRow.propTypes = {
 };
 
 class IssueReport extends _react2.default.Component {
-  static dataFetcher(_ref) {
-    let urlBase = _ref.urlBase,
-        location = _ref.location;
-
-    const search = location.search ? `${location.search}&_summary` : '?_summary';
-    return fetch(`${urlBase || ''}/api/issues/${search}`).then(response => {
-      if (!response.ok) return response.json().then(error => Promise.reject(error));
-      return response.json().then(data => ({ IssueReport: data }));
-    });
-  }
-
   constructor(props, context) {
     super(props, context);
+    console.log('contexL: ', context);
     console.log("the context is : ", this.context);
-    const stats = context.initialState.IssueReport ? context.initialState.IssueReport : {};
+    const stats = context.initialState ? context.initialState.IssueReport : {};
     this.state = {
       stats: stats,
       toastVisible: false, toastMessage: '', toastType: 'Success'
@@ -2778,6 +2801,18 @@ class IssueReport extends _react2.default.Component {
     this.setFilter = this.setFilter.bind(this);
     this.showError = this.showError.bind(this);
     this.dismissToast = this.dismissToast.bind(this);
+  }
+
+  static dataFetcher(_ref) {
+    let urlBase = _ref.urlBase,
+        location = _ref.location;
+
+    const search = location.search ? `${location.search}&_summary` : '?_summary';
+    return fetch(`${urlBase || ''}/api/issues/${search}`).then(response => {
+      console.log("the response is : ", response);
+      if (!response.ok) return response.json().then(error => Promise.reject(error));
+      return response.json().then(data => ({ IssueReport: data }));
+    });
   }
 
   componentDidMound() {

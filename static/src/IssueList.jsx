@@ -2,12 +2,14 @@ import React from 'react';
 import 'isomorphic-fetch';
 import PropTypes from 'prop-types';
 import {Link, withRouter} from 'react-router';
-import {Button, Glyphicon, Table, Panel } from 'react-bootstrap';
+import {Button, Glyphicon, Table, Panel, Pagination } from 'react-bootstrap';
 
 import IssueAdd from './IssueAdd.jsx';
 import IssueFilter from './IssueFilter.jsx';
 import Toast from './Toast.jsx';
 
+
+const PAGE_SIZE = 10;
 
 const IssueRow = (props) => {
   function onDeleteClick(){
@@ -69,8 +71,15 @@ IssueTable.propTypes = {
 class IssueList extends React.Component {
 
   static dataFetcher({urlBase, location}){
-  return fetch(`${urlBase,'' }/api/issues${location.search}`)
-          .then(response =>{
+    const query = Object.assign({}, location.query);
+    const pageStr = query._page;
+    if(pageStr){
+      delete query._page;
+      query._offset= (parseInt(pageStr, 10)-1) * PAGE_SIZE;
+    }
+    query._limit = PAGE_SIZE;
+    const search = Object.keys(query).map(k=>`${k}=${query[k]}`).join('&');
+    return fetch(`${urlBase || ''}/api/issues?${search}`).then(response=>{
             if(!response.ok) return response.json(). then(error=>
             Promise.reject(error));
             return response.json().then(data=> ({IssueList: data}));
@@ -79,8 +88,10 @@ class IssueList extends React.Component {
 
   constructor(props, context) {
     super(props, context);
-  //  const issues = context.initialState.data.records;
-  const issues = context.initialState && context.initialState.IssueList ? context.initialState.IssueList.records : [];
+   //const issues = context.initialState.data.records;
+  //const issues = context.initialState && context.initialState.IssueList ? context.initialState.IssueList.records : [];
+ const data = context.initialState.IssueList ? context.initialState.IssueList : {metadata : {totalCount: 0}, records: []};
+ const issues = data.records;
 
     issues.forEach(issue=>{
       issue.created = new Date(issue.created);
@@ -89,8 +100,12 @@ class IssueList extends React.Component {
       }
     });
     this.state = { issues, toastVisible: false,
-    toastMessage: '', toastType: 'success' };
+    toastMessage: '', toastType: 'success',
+    totalCount :  data.metadata.totalCount,
+    };
 
+
+    this.selectPage = this.selectPage.bind(this);
     this.createIssue = this.createIssue.bind(this);
     this.setFilter = this.setFilter.bind(this);
     this.deleteIssue = this.deleteIssue.bind(this);
@@ -135,11 +150,17 @@ class IssueList extends React.Component {
 
     if(oldQuery.status == newQuery.status
      && oldQuery.effort_gte === newQuery.effort_gte
-     && oldQuery.effort_lte === newQuery.effort_lte){
+     && oldQuery.effort_lte === newQuery.effort_lte
+     && oldQuery._page === newQuery._page){
       return;
      }
 
     this.loadData();
+  }
+
+  selectPage(){
+    const query= Object.assign(this.props.location.query, {_page: eventkey});
+    this.props.router.push({pathname: this.props.location.pathname, query});
   }
 
   loadData() {
@@ -171,7 +192,8 @@ class IssueList extends React.Component {
           issue.completionDate = new Date(issue.completionDate);
         }
       });
-      this.setState({issues});
+      this.setState({issues, totalCount: data.IssueList.metadata.totalCount});
+      console.log('satet:',  issues);
     }).catch(err => {
        this.showError(`Error in fetching data from server: ${err}`);
      });
@@ -204,13 +226,18 @@ class IssueList extends React.Component {
   }
 
   render() {
+    console.log("issueList : ", this.state);
     return (
       <div>
         <Panel collapsible header="Filter">
           <IssueFilter setFilter={this.setFilter}
             initFilter={this.props.location.query}  />
       </Panel>
+        <Pagination
 
+          items={Math.ceil(this.state.totalCount / PAGE_SIZE)}
+          activePage = {parseInt(this.props.location.query._page || '1', 10)}
+          onSelect={this.selectPage} maxButton={7} next prev boundaryLinks />
         <IssueTable issues={this.state.issues} deleteIssue={this.deleteIssue}/>
 
         <IssueAdd createIssue={this.createIssue} />

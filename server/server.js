@@ -96,10 +96,16 @@ app.get('/api/issues', (req, res) => {
   if(req.query.effort_lte || req.query.effort_gte) filter.effort ={};
   if(req.query.effort_lte) filter.effort.$lte = parseInt(req.query.effort_lte, 10);
   if(req.query.effort_gte) filter.effort.$gte = parseInt(req.query.effort_gte, 10);
-  if(req.query._summary == undefined){
+  if(req.query._summary === undefined){
+    const offset = req.query._offset ? parseInt(req.query._offset, 10) :0;
     let limit = req.query.limit ? parseInt(req.query._limit, 10) :20;
     if (limit >50) limit = 50;
-    db.collection('issues').find(filter).toArray().then((issues) => {
+      const cursor =db.collection('issues').find(filter).sort({_id: 1}).skip(offset).limit(limit);
+      let totalCount;
+      cursor.count(false).then(result=>{
+        totalCount = result;
+        return cursor.toArray();
+      }).then((issues) => {
       const metadata = { total_count: issues.length };
       res.json({ metadata, records: issues });
       console.log("request");
