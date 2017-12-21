@@ -82,7 +82,9 @@ class IssueList extends React.Component {
     return fetch(`${urlBase || ''}/api/issues?${search}`).then(response=>{
             if(!response.ok) return response.json(). then(error=>
             Promise.reject(error));
-            return response.json().then(data=> ({IssueList: data}));
+            return response.json().then(data=>
+              ({IssueList: data})
+            );
           });
   }
 
@@ -158,7 +160,7 @@ class IssueList extends React.Component {
     this.loadData();
   }
 
-  selectPage(){
+  selectPage(eventkey){
     const query= Object.assign(this.props.location.query, {_page: eventkey});
     this.props.router.push({pathname: this.props.location.pathname, query});
   }
@@ -192,7 +194,7 @@ class IssueList extends React.Component {
           issue.completionDate = new Date(issue.completionDate);
         }
       });
-      this.setState({issues, totalCount: data.IssueList.metadata.totalCount});
+      this.setState({issues, totalCount: data.IssueList.metadata.total_count});
       console.log('satet:',  issues);
     }).catch(err => {
        this.showError(`Error in fetching data from server: ${err}`);
@@ -237,7 +239,7 @@ class IssueList extends React.Component {
 
           items={Math.ceil(this.state.totalCount / PAGE_SIZE)}
           activePage = {parseInt(this.props.location.query._page || '1', 10)}
-          onSelect={this.selectPage} maxButton={7} next prev boundaryLinks />
+          onSelect={this.selectPage} maxButtons={7} next prev boundaryLinks />
         <IssueTable issues={this.state.issues} deleteIssue={this.deleteIssue}/>
 
         <IssueAdd createIssue={this.createIssue} />
