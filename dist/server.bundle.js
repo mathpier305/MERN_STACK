@@ -20,7 +20,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "7c603e8c856adef1eac9"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "c4ff8492cd2760903fb6"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -2780,7 +2780,7 @@ class IssueReport extends _react2.default.Component {
     this.dismissToast = this.dismissToast.bind(this);
   }
 
-  componentDidMound() {
+  componentDidMount() {
     this.loadData();
   }
 
@@ -2821,7 +2821,7 @@ class IssueReport extends _react2.default.Component {
       _react2.default.createElement(
         _reactBootstrap.Panel,
         { collapsible: true, header: 'Filter' },
-        _react2.default.createElement('issueFilter', { setFilter: this.setFilter, initFilter: this.props.location.query })
+        _react2.default.createElement(_IssueFilter2.default, { setFilter: this.setFilter, initFilter: this.props.location.query })
       ),
       _react2.default.createElement(
         _reactBootstrap.Table,

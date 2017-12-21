@@ -42,7 +42,7 @@ export default class IssueReport extends React.Component{
     this.dismissToast = this.dismissToast.bind(this);
   }
 
-  componentDidMound(){
+  componentDidMount(){
     this.loadData();
   }
 
@@ -80,7 +80,7 @@ export default class IssueReport extends React.Component{
     return(
       <div>
         <Panel collapsible header="Filter">
-          <issueFilter setFilter={this.setFilter} initFilter={this.props.location.query} />
+          <IssueFilter setFilter={this.setFilter} initFilter={this.props.location.query} />
         </Panel>
         <Table bordered condensed hover responsive>
           <thead>
