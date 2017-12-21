@@ -106,7 +106,7 @@ app.get('/api/issues', (req, res) => {
         totalCount = result;
         return cursor.toArray();
       }).then((issues) => {
-      const metadata = { total_count: issues.length };
+      const metadata = { total_count: totalCount };
       res.json({ metadata, records: issues });
       console.log("request");
     })

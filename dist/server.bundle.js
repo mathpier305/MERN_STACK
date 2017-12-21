@@ -20,7 +20,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "1ee0de0a241f7f3958cc"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "1f5ab02b71c732855c54"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -830,7 +830,7 @@ app.get('/api/issues', (req, res) => {
       totalCount = result;
       return cursor.toArray();
     }).then(issues => {
-      const metadata = { total_count: issues.length };
+      const metadata = { total_count: totalCount };
       res.json({ metadata: metadata, records: issues });
       console.log("request");
     }).catch(error => {
@@ -2010,7 +2010,7 @@ class IssueList extends _react2.default.Component {
     this.loadData();
   }
 
-  selectPage() {
+  selectPage(eventkey) {
     const query = Object.assign(this.props.location.query, { _page: eventkey });
     this.props.router.push({ pathname: this.props.location.pathname, query: query });
   }
@@ -2044,7 +2044,7 @@ class IssueList extends _react2.default.Component {
           issue.completionDate = new Date(issue.completionDate);
         }
       });
-      this.setState({ issues: issues, totalCount: data.IssueList.metadata.totalCount });
+      this.setState({ issues: issues, totalCount: data.IssueList.metadata.total_count });
       console.log('satet:', issues);
     }).catch(err => {
       this.showError(`Error in fetching data from server: ${err}`);
@@ -2091,7 +2091,7 @@ class IssueList extends _react2.default.Component {
 
         items: Math.ceil(this.state.totalCount / PAGE_SIZE),
         activePage: parseInt(this.props.location.query._page || '1', 10),
-        onSelect: this.selectPage, maxButton: 7, next: true, prev: true, boundaryLinks: true }),
+        onSelect: this.selectPage, maxButtons: 7, next: true, prev: true, boundaryLinks: true }),
       _react2.default.createElement(IssueTable, { issues: this.state.issues, deleteIssue: this.deleteIssue }),
       _react2.default.createElement(_IssueAdd2.default, { createIssue: this.createIssue }),
       _react2.default.createElement(_Toast2.default, { showing: this.state.toastVisible, message: this.state.toastMessage,
