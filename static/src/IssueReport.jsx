@@ -35,16 +35,7 @@ export default class IssueReport extends React.Component{
     this.dismissToast = this.dismissToast.bind(this);
   }
 
-  static dataFetcher({urlBase, location}){
-    const search = location.search ? `${location.search}&_summary` : '?_summary';
-    return fetch(`${urlBase || ''}/api/issues/${search}`).then(response=>{
-      console.log("the response is : ", response);
-      if(!response.ok) return  response.json().then(error=>Promise.reject(error));
-      return response.json().then(data=>({IssueReport: data}));
-    });
-  }
-
-  componentDidMound(){
+  componentDidMount(){
     this.loadData();
   }
 
@@ -82,7 +73,7 @@ export default class IssueReport extends React.Component{
     return(
       <div>
         <Panel collapsible header="Filter">
-          <issueFilter setFilter={this.setFilter} initFilter={this.props.location.query} />
+          <IssueFilter setFilter={this.setFilter} initFilter={this.props.location.query} />
         </Panel>
         <Table bordered condensed hover responsive>
           <thead>
