@@ -20,11 +20,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-<<<<<<< HEAD
-/******/ 	var hotCurrentHash = "2dd152e39013e3e97f3e"; // eslint-disable-line no-unused-vars
-=======
-/******/ 	var hotCurrentHash = "c4ff8492cd2760903fb6"; // eslint-disable-line no-unused-vars
->>>>>>> 7c0ad95
+/******/ 	var hotCurrentHash = "faa190f5026611f912a5"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -713,7 +709,8 @@ module.exports = require("react-bootstrap");
 module.exports = require("react-router");
 
 /***/ }),
-/* 4 */
+/* 4 */,
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -763,10 +760,10 @@ let db;
 
 if (process.env.NODE_ENV !== 'production') {
   const webpack = __webpack_require__(11);
-  const webpackDevMiddleware = __webpack_require__(32);
-  const webpackHotMiddleware = __webpack_require__(33);
+  const webpackDevMiddleware = __webpack_require__(33);
+  const webpackHotMiddleware = __webpack_require__(34);
 
-  const config = __webpack_require__(34);
+  const config = __webpack_require__(35);
   config.entry.app.push('webpack-hot-middleware/client', 'webpack/hot/only-dev-server');
   config.plugins.push(new webpack.HotModuleReplacementPlugin());
 
@@ -932,71 +929,6 @@ exports.setDB = setDB;
 // }).catch((error) => {
 //   console.log('ERROR', error);
 // });
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = __webpack_require__(1);
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _reactBootstrap = __webpack_require__(2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class Toast extends _react2.default.Component {
-  ComponentDidUpdate() {
-    if (this.props.showing) {
-      clearTimeout(this.dismissTimer);
-      this.dismissTimer = setTimeout(this.props.onDismiss, 5000);
-    }
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.dismissTimer);
-  }
-
-  render() {
-    return _react2.default.createElement(
-      _reactBootstrap.Collapse,
-      { 'in': this.props.showing },
-      _react2.default.createElement(
-        'div',
-        { style: { position: 'fixed', top: 30, left: 0, right: 0, textAlign: 'center' } },
-        _react2.default.createElement(
-          _reactBootstrap.Alert,
-          { style: { display: 'inline-block', width: 500 }, bsStyle: this.props.bsStyle,
-            onDismiss: this.props.onDismiss },
-          this.props.message
-        )
-      )
-    );
-  }
-}
-
-exports.default = Toast;
-Toast.propTypes = {
-  showing: _propTypes2.default.bool.isRequired,
-  onDismiss: _propTypes2.default.func.isRequired,
-  bsStyle: _propTypes2.default.string,
-  message: _propTypes2.default.any.isRequired
-};
-
-Toast.defaultProps = {
-  bsStyle: 'success'
-};
 
 /***/ }),
 /* 6 */
@@ -1311,7 +1243,7 @@ module.exports.setLogLevel = function(level) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(14);
-module.exports = __webpack_require__(35);
+module.exports = __webpack_require__(36);
 
 
 /***/ }),
@@ -1338,7 +1270,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 _sourceMapSupport2.default.install();
 
 
-let appModule = __webpack_require__(4);
+let appModule = __webpack_require__(5);
 let db;
 let server;
 
@@ -1355,9 +1287,9 @@ _mongodb.MongoClient.connect('mongodb://localhost/issuetracker').then(connection
 });
 
 if (true) {
-  module.hot.accept(4, () => {
+  module.hot.accept(5, () => {
     server.removeListener('request', appModule.app);
-    appModule = __webpack_require__(4); //eslinit-disable-line
+    appModule = __webpack_require__(5); //eslinit-disable-line
     appModule.setDB(db);
     server.on('request', appModule.app);
   });
@@ -1476,7 +1408,7 @@ var _Routes = __webpack_require__(22);
 
 var _Routes2 = _interopRequireDefault(_Routes);
 
-var _ContextWrapper = __webpack_require__(31);
+var _ContextWrapper = __webpack_require__(32);
 
 var _ContextWrapper2 = _interopRequireDefault(_ContextWrapper);
 
@@ -1590,15 +1522,15 @@ var _App = __webpack_require__(23);
 
 var _App2 = _interopRequireDefault(_App);
 
-var _IssueList = __webpack_require__(24);
+var _IssueList = __webpack_require__(26);
 
 var _IssueList2 = _interopRequireDefault(_IssueList);
 
-var _IssueEdit = __webpack_require__(27);
+var _IssueEdit = __webpack_require__(28);
 
 var _IssueEdit2 = _interopRequireDefault(_IssueEdit);
 
-var _IssueReport = __webpack_require__(30);
+var _IssueReport = __webpack_require__(31);
 
 var _IssueReport2 = _interopRequireDefault(_IssueReport);
 
@@ -1760,7 +1692,8 @@ App.propTypes = {
 exports.default = App;
 
 /***/ }),
-/* 24 */
+/* 24 */,
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1774,7 +1707,72 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-__webpack_require__(25);
+var _propTypes = __webpack_require__(1);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _reactBootstrap = __webpack_require__(2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class Toast extends _react2.default.Component {
+  ComponentDidUpdate() {
+    if (this.props.showing) {
+      clearTimeout(this.dismissTimer);
+      this.dismissTimer = setTimeout(this.props.onDismiss, 5000);
+    }
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.dismissTimer);
+  }
+
+  render() {
+    return _react2.default.createElement(
+      _reactBootstrap.Collapse,
+      { 'in': this.props.showing },
+      _react2.default.createElement(
+        'div',
+        { style: { position: 'fixed', top: 30, left: 0, right: 0, textAlign: 'center' } },
+        _react2.default.createElement(
+          _reactBootstrap.Alert,
+          { style: { display: 'inline-block', width: 500 }, bsStyle: this.props.bsStyle,
+            onDismiss: this.props.onDismiss },
+          this.props.message
+        )
+      )
+    );
+  }
+}
+
+exports.default = Toast;
+Toast.propTypes = {
+  showing: _propTypes2.default.bool.isRequired,
+  onDismiss: _propTypes2.default.func.isRequired,
+  bsStyle: _propTypes2.default.string,
+  message: _propTypes2.default.any.isRequired
+};
+
+Toast.defaultProps = {
+  bsStyle: 'success'
+};
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+__webpack_require__(27);
 
 var _propTypes = __webpack_require__(1);
 
@@ -1784,7 +1782,7 @@ var _reactRouter = __webpack_require__(3);
 
 var _reactBootstrap = __webpack_require__(2);
 
-var _IssueAdd = __webpack_require__(26);
+var _IssueAdd = __webpack_require__(38);
 
 var _IssueAdd2 = _interopRequireDefault(_IssueAdd);
 
@@ -1792,7 +1790,7 @@ var _IssueFilter = __webpack_require__(10);
 
 var _IssueFilter2 = _interopRequireDefault(_IssueFilter);
 
-var _Toast = __webpack_require__(5);
+var _Toast = __webpack_require__(25);
 
 var _Toast2 = _interopRequireDefault(_Toast);
 
@@ -2116,74 +2114,13 @@ IssueList.propTypes = {
 exports.default = IssueList;
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports) {
 
 module.exports = require("isomorphic-fetch");
 
 /***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactBootstrap = __webpack_require__(2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class IssueAdd extends _react2.default.Component {
-  constructor() {
-    super();
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleSubmit(e) {
-    e.preventDefault();
-    var form = document.forms.issueAdd;
-    this.props.createIssue({
-      owner: form.owner.value,
-      title: form.title.value,
-      status: 'New',
-      created: new Date()
-    });
-    //clear form for the next input
-    form.owner.value = "";
-    form.title.value = "";
-  }
-
-  render() {
-    return _react2.default.createElement(
-      'div',
-      null,
-      _react2.default.createElement(
-        _reactBootstrap.Form,
-        { inline: true, name: 'issueAdd', onSubmit: this.handleSubmit },
-        _react2.default.createElement(_reactBootstrap.FormControl, { name: 'owner', placeholder: 'Owner' }),
-        ' ',
-        _react2.default.createElement(_reactBootstrap.FormControl, { name: 'title', placeholder: 'Title' }),
-        ' ',
-        _react2.default.createElement(
-          _reactBootstrap.Button,
-          { type: 'submit', bsStyle: 'primary' },
-          'Add'
-        )
-      )
-    );
-  }
-}
-exports.default = IssueAdd;
-
-/***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2207,15 +2144,15 @@ var _reactRouterBootstrap = __webpack_require__(9);
 
 var _reactBootstrap = __webpack_require__(2);
 
-var _NumInput = __webpack_require__(28);
+var _NumInput = __webpack_require__(29);
 
 var _NumInput2 = _interopRequireDefault(_NumInput);
 
-var _DateInput = __webpack_require__(29);
+var _DateInput = __webpack_require__(30);
 
 var _DateInput2 = _interopRequireDefault(_DateInput);
 
-var _Toast = __webpack_require__(5);
+var _Toast = __webpack_require__(25);
 
 var _Toast2 = _interopRequireDefault(_Toast);
 
@@ -2579,7 +2516,7 @@ IssueEdit.PropTypes = {
 exports.default = IssueEdit;
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2644,7 +2581,7 @@ NumInput.propTypes = {
 };
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2740,7 +2677,7 @@ DateInput.propTypes = {
 };
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2764,7 +2701,7 @@ var _IssueFilter = __webpack_require__(10);
 
 var _IssueFilter2 = _interopRequireDefault(_IssueFilter);
 
-var _Toast = __webpack_require__(5);
+var _Toast = __webpack_require__(25);
 
 var _Toast2 = _interopRequireDefault(_Toast);
 
@@ -2807,23 +2744,7 @@ class IssueReport extends _react2.default.Component {
     this.dismissToast = this.dismissToast.bind(this);
   }
 
-<<<<<<< HEAD
-  static dataFetcher(_ref) {
-    let urlBase = _ref.urlBase,
-        location = _ref.location;
-
-    const search = location.search ? `${location.search}&_summary` : '?_summary';
-    return fetch(`${urlBase || ''}/api/issues/${search}`).then(response => {
-      console.log("the response is : ", response);
-      if (!response.ok) return response.json().then(error => Promise.reject(error));
-      return response.json().then(data => ({ IssueReport: data }));
-    });
-  }
-
-  componentDidMound() {
-=======
   componentDidMount() {
->>>>>>> 7c0ad95
     this.loadData();
   }
 
@@ -2907,7 +2828,7 @@ IssueReport.contextTypes = {
 };
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2948,19 +2869,19 @@ ContextWrapper.propTypes = {
 };
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports) {
 
 module.exports = require("webpack-dev-middleware");
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports) {
 
 module.exports = require("webpack-hot-middleware");
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3003,7 +2924,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, "/"))
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(__resourceQuery) {/*
@@ -3022,7 +2943,7 @@ if(true) {
 					if(fromUpdate) log("info", "[HMR] Update applied.");
 					return;
 				}
-				__webpack_require__(36)(updatedModules, updatedModules);
+				__webpack_require__(37)(updatedModules, updatedModules);
 				checkForUpdate(true);
 			}).catch(function(err) {
 				var status = module.hot.status();
@@ -3044,7 +2965,7 @@ if(true) {
 /* WEBPACK VAR INJECTION */}.call(exports, "?1000"))
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -3086,6 +3007,67 @@ module.exports = function(updatedModules, renewedModules) {
 	}
 };
 
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactBootstrap = __webpack_require__(2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class IssueAdd extends _react2.default.Component {
+  constructor() {
+    super();
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+    var form = document.forms.issueAdd;
+    this.props.createIssue({
+      owner: form.owner.value,
+      title: form.title.value,
+      status: 'New',
+      created: new Date()
+    });
+    //clear form for the next input
+    form.owner.value = "";
+    form.title.value = "";
+  }
+
+  render() {
+    return _react2.default.createElement(
+      'div',
+      null,
+      _react2.default.createElement(
+        _reactBootstrap.Form,
+        { inline: true, name: 'issueAdd', onSubmit: this.handleSubmit },
+        _react2.default.createElement(_reactBootstrap.FormControl, { name: 'owner', placeholder: 'Owner' }),
+        ' ',
+        _react2.default.createElement(_reactBootstrap.FormControl, { name: 'title', placeholder: 'Title' }),
+        ' ',
+        _react2.default.createElement(
+          _reactBootstrap.Button,
+          { type: 'submit', bsStyle: 'primary' },
+          'Add'
+        )
+      )
+    );
+  }
+}
+exports.default = IssueAdd;
 
 /***/ })
 /******/ ])));
