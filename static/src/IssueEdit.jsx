@@ -7,7 +7,8 @@ import {FormGroup, FormControl, ControlLabel, ButtonToolbar,
 
 import NumInput from './NumInput.jsx';
 import DateInput from './DateInput.jsx';
-import Toast from './Toast.jsx';
+//import Toast from './Toast.jsx';
+import withToast from './withToast.jsx';
 
 class IssueEdit extends React.Component { // eslint-disable-line
 static dataFetcher({params, urlBase}){
@@ -44,12 +45,9 @@ constructor(props, context){
       issue,
       invalidFields: {},
       showingValidation: false,
-      toastVisible: false, toastMessage: '', toastType: 'success',
   };
   this.dismissValidation = this.dismissValidation.bind(this);
   this.showValidation =this.showValidation.bind(this);
-  this.showSuccess =this.showSuccess.bind(this);
-  this.showError = this.showError.bind(this);
   this.onChange = this.onChange.bind(this);
   this.onValidityChange = this.onValidityChange.bind(this);
   this.onSubmit = this.onSubmit.bind(this);
@@ -102,15 +100,15 @@ onSubmit(event){
         updateIssue.completionDate = new Date(updateIssue.completionDate);
       }
       this.setState({issue: updateIssue});
-      this.showSuccess('Updated issue successfully.');
+      this.props.showSuccess('Updated issue successfully.');
     });
   }else{
     response.json().then(error=>{
-      this.showError(`Failed to update issue: ${error.message}`);
+      this.props.showError(`Failed to update issue: ${error.message}`);
     });
   }
 }).catch(err =>{
-  this.showError(`Error in sending data to server: ${err.message}`);
+  this.props.showError(`Error in sending data to server: ${err.message}`);
 });
 }
 
@@ -158,17 +156,6 @@ loadData(){
   });
 }
 
-showSuccess(message){
-  this.setState({toastVisible: true, toastMessage: message, toastType: 'success'});
-}
-
-showError(message){
-  this.setState({toastVisible: true, toastMessage: message, toastType: 'danger'});
-}
-
-dismissToast(){
-  this.setState({toastVisible: false});
-}
   render() {
     const issue = this.state.issue;
     let validationMessage =null;
@@ -270,8 +257,6 @@ dismissToast(){
           </FormGroup>
 
         </Form>
-        <Toast showing={this.state.toastVisible} message={this.state.toastMessage}
-          onDismiss={this.dismissToast} bsStyle={this.state.toastType} />
       </Panel>
     );
   }
@@ -281,8 +266,13 @@ IssueEdit.contextTypes = {
   initialState: React.PropTypes.object,
 };
 
-IssueEdit.PropTypes = {
+IssueEdit.propTypes = {
   params: PropTypes.object.isRequired,
+  showSuccess: PropTypes.func.isRequired,
+  showError: PropTypes.func.isRequired,
 };
 
-export default IssueEdit;
+const IssueEditWithToast = withToast(IssueEdit);
+IssueEditWithToast.dataFetcher = IssueEdit.dataFetcher;
+
+export default IssueEditWithToast;
