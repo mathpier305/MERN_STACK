@@ -4,10 +4,10 @@ import PropTypes from 'prop-types';
 import {Link, withRouter} from 'react-router';
 import {Button, Glyphicon, Table, Panel, Pagination } from 'react-bootstrap';
 
-import IssueAdd from './IssueAdd.jsx';
+//import IssueAdd from './IssueAdd.jsx';
 import IssueFilter from './IssueFilter.jsx';
-import Toast from './Toast.jsx';
-
+//import Toast from './Toast.jsx';
+import withToast from './withToast.jsx';
 
 const PAGE_SIZE = 10;
 
@@ -101,32 +101,20 @@ class IssueList extends React.Component {
         issue.completionDate = new Date(issue.completionDate);
       }
     });
-    this.state = { issues, toastVisible: false,
-    toastMessage: '', toastType: 'success',
+    this.state = { issues,
     totalCount :  data.metadata.totalCount,
     };
 
 
     this.selectPage = this.selectPage.bind(this);
-    this.createIssue = this.createIssue.bind(this);
+    //this.createIssue = this.createIssue.bind(this);
     this.setFilter = this.setFilter.bind(this);
     this.deleteIssue = this.deleteIssue.bind(this);
-    this.showError = this.showError.bind(this);
-    this.dismissToast = this.dismissToast.bind(this);
-  }
-
-  showError(message){
-    this.setState({toastVisible: true, toastMessage: message,
-                  toastType: 'danger'});
-  }
-
-  dismissToast(){get
-    this.setState({toastVisible: false});
   }
 
   deleteIssue(id){
     fetch(`/api/issues/${id}`,{method: 'DELETE'}).then(response =>{
-      if(!response.ok) alert('Failed to delete issue');
+      if(!response.ok) this.props.showError('Failed to delete issue');
       else this.loadData();
     })
   }
@@ -197,35 +185,35 @@ class IssueList extends React.Component {
       this.setState({issues, totalCount: data.IssueList.metadata.total_count});
       console.log('satet:',  issues);
     }).catch(err => {
-       this.showError(`Error in fetching data from server: ${err}`);
+       this.props.showError(`Error in fetching data from server: ${err}`);
      });
 
   }
 
-  createIssue(newIssue) {
-    fetch('/api/issues', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newIssue),
-    }).then(response => {
-      if (response.ok) {
-        response.json().then(updatedIssue => {
-          updatedIssue.created = new Date(updatedIssue.created);
-          if (updatedIssue.completionDate) {
-            updatedIssue.completionDate = new Date(updatedIssue.completionDate);
-          }
-          const newIssues = this.state.issues.concat(updatedIssue);
-          this.setState({ issues: newIssues });
-        });
-      } else {
-        response.json().then(error => {
-          this.showError(`Failed to add issue: ${error.message}`);
-        });
-      }
-    }).catch(err => {
-      this.showError(`Error in sending data to server: ${err.message}`);
-    });
-  }
+  // createIssue(newIssue) {
+  //   fetch('/api/issues', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify(newIssue),
+  //   }).then(response => {
+  //     if (response.ok) {
+  //       response.json().then(updatedIssue => {
+  //         updatedIssue.created = new Date(updatedIssue.created);
+  //         if (updatedIssue.completionDate) {
+  //           updatedIssue.completionDate = new Date(updatedIssue.completionDate);
+  //         }
+  //         const newIssues = this.state.issues.concat(updatedIssue);
+  //         this.setState({ issues: newIssues });
+  //       });
+  //     } else {
+  //       response.json().then(error => {
+  //         this.props.showError(`Failed to add issue: ${error.message}`);
+  //       });
+  //     }
+  //   }).catch(err => {
+  //     this.props.showError(`Error in sending data to server: ${err.message}`);
+  //   });
+  // }
 
   render() {
     console.log("issueList : ", this.state);
@@ -242,9 +230,8 @@ class IssueList extends React.Component {
           onSelect={this.selectPage} maxButtons={7} next prev boundaryLinks />
         <IssueTable issues={this.state.issues} deleteIssue={this.deleteIssue}/>
 
-        <IssueAdd createIssue={this.createIssue} />
-        <Toast showing={this.state.toastVisible} message={this.state.toastMessage}
-          onDismiss={this.dismissToast} bsStyle={this.state.toastType} />
+
+
 
       </div>
     );
@@ -258,6 +245,10 @@ IssueList.contextTypes = {
 IssueList.propTypes = {
   location: PropTypes.object.isRequired,
   router: PropTypes.object,
+  showError: PropTypes.func.isRequired,
 };
 
-export default IssueList;
+const IssueListWithToast = withToast(IssueList);
+IssueListWithToast.dataFetcher = IssueList.dataFetcher;
+
+export default IssueListWithToast;

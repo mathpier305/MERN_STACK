@@ -10,6 +10,7 @@ const NoMatch = () => <p>Page Not Found </p>;
 
 export default (
   <Route path="/" component={App}>
+    
     <Route path="issues" component={withRouter(IssueList)} />
     <Route path="issues/:id" component={IssueEdit} />
     <Route path="reports" component={withRouter(IssueReport)} />

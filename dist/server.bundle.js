@@ -20,7 +20,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "1f5ab02b71c732855c54"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "29e73ae9252f86879450"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -718,6 +718,69 @@ module.exports = require("react-router");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+exports.default = withToast;
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _Toast = __webpack_require__(25);
+
+var _Toast2 = _interopRequireDefault(_Toast);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function withToast(OriginalComponent) {
+  return class WithToast extends _react2.default.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        toastVisible: false,
+        toastMessage: '',
+        toastType: 'success'
+      };
+      this.showSuccess = this.showSuccess.bind(this);
+      this.showError = this.showError.bind(this);
+      this.dismissToast = this.dismissToast.bind(this);
+    }
+
+    showSuccess(message) {
+      this.setState({ toastVisible: true, toastMessage: message,
+        toastType: 'danger' });
+    }
+
+    dismissToast() {
+      this.setState({ toastVisible: false });
+    }
+
+    render() {
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(OriginalComponent, _extends({
+          showError: this.showError, showSuccess: this.showSuccess
+        }, this.props)),
+        _react2.default.createElement(_Toast2.default, {
+          showing: this.state.toastVisible, message: this.toastMessage,
+          onDismiss: this.dismissToast, bsStyle: this.state.toastType })
+      );
+    }
+  };
+}
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.setDB = exports.app = undefined;
 
 var _express = __webpack_require__(8);
@@ -759,10 +822,10 @@ let db;
 
 if (process.env.NODE_ENV !== 'production') {
   const webpack = __webpack_require__(11);
-  const webpackDevMiddleware = __webpack_require__(32);
-  const webpackHotMiddleware = __webpack_require__(33);
+  const webpackDevMiddleware = __webpack_require__(33);
+  const webpackHotMiddleware = __webpack_require__(34);
 
-  const config = __webpack_require__(34);
+  const config = __webpack_require__(35);
   config.entry.app.push('webpack-hot-middleware/client', 'webpack/hot/only-dev-server');
   config.plugins.push(new webpack.HotModuleReplacementPlugin());
 
@@ -928,71 +991,6 @@ exports.setDB = setDB;
 // }).catch((error) => {
 //   console.log('ERROR', error);
 // });
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = __webpack_require__(1);
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _reactBootstrap = __webpack_require__(2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class Toast extends _react2.default.Component {
-  ComponentDidUpdate() {
-    if (this.props.showing) {
-      clearTimeout(this.dismissTimer);
-      this.dismissTimer = setTimeout(this.props.onDismiss, 5000);
-    }
-  }
-
-  componentWillUnmount() {
-    clearTimeout(this.dismissTimer);
-  }
-
-  render() {
-    return _react2.default.createElement(
-      _reactBootstrap.Collapse,
-      { 'in': this.props.showing },
-      _react2.default.createElement(
-        'div',
-        { style: { position: 'fixed', top: 30, left: 0, right: 0, textAlign: 'center' } },
-        _react2.default.createElement(
-          _reactBootstrap.Alert,
-          { style: { display: 'inline-block', width: 500 }, bsStyle: this.props.bsStyle,
-            onDismiss: this.props.onDismiss },
-          this.props.message
-        )
-      )
-    );
-  }
-}
-
-exports.default = Toast;
-Toast.propTypes = {
-  showing: _propTypes2.default.bool.isRequired,
-  onDismiss: _propTypes2.default.func.isRequired,
-  bsStyle: _propTypes2.default.string,
-  message: _propTypes2.default.any.isRequired
-};
-
-Toast.defaultProps = {
-  bsStyle: 'success'
-};
 
 /***/ }),
 /* 6 */
@@ -1307,7 +1305,7 @@ module.exports.setLogLevel = function(level) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(14);
-module.exports = __webpack_require__(35);
+module.exports = __webpack_require__(36);
 
 
 /***/ }),
@@ -1334,7 +1332,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 _sourceMapSupport2.default.install();
 
 
-let appModule = __webpack_require__(4);
+let appModule = __webpack_require__(5);
 let db;
 let server;
 
@@ -1351,9 +1349,9 @@ _mongodb.MongoClient.connect('mongodb://localhost/issuetracker').then(connection
 });
 
 if (true) {
-  module.hot.accept(4, () => {
+  module.hot.accept(5, () => {
     server.removeListener('request', appModule.app);
-    appModule = __webpack_require__(4); //eslinit-disable-line
+    appModule = __webpack_require__(5); //eslinit-disable-line
     appModule.setDB(db);
     server.on('request', appModule.app);
   });
@@ -1472,7 +1470,7 @@ var _Routes = __webpack_require__(22);
 
 var _Routes2 = _interopRequireDefault(_Routes);
 
-var _ContextWrapper = __webpack_require__(31);
+var _ContextWrapper = __webpack_require__(32);
 
 var _ContextWrapper2 = _interopRequireDefault(_ContextWrapper);
 
@@ -1493,6 +1491,7 @@ renderedPageRouter.get('*', (req, res) => {
       res.redirect(302, redirectLocation.pathname + redirectLocation.search);
     } else if (renderProps) {
       const componentsWithData = renderProps.components.filter(c => c.dataFetcher);
+      console.log("***** componentsWithData : ", renderProps);
       const dataFetchers = componentsWithData.map(c => c.dataFetcher({
         params: renderProps.params,
         location: renderProps.location,
@@ -1586,15 +1585,15 @@ var _App = __webpack_require__(23);
 
 var _App2 = _interopRequireDefault(_App);
 
-var _IssueList = __webpack_require__(24);
+var _IssueList = __webpack_require__(26);
 
 var _IssueList2 = _interopRequireDefault(_IssueList);
 
-var _IssueEdit = __webpack_require__(27);
+var _IssueEdit = __webpack_require__(28);
 
 var _IssueEdit2 = _interopRequireDefault(_IssueEdit);
 
-var _IssueReport = __webpack_require__(30);
+var _IssueReport = __webpack_require__(31);
 
 var _IssueReport2 = _interopRequireDefault(_IssueReport);
 
@@ -1640,17 +1639,19 @@ var _reactBootstrap = __webpack_require__(2);
 
 var _reactRouterBootstrap = __webpack_require__(9);
 
+var _IssueAddNavItem = __webpack_require__(24);
+
+var _IssueAddNavItem2 = _interopRequireDefault(_IssueAddNavItem);
+
+var _withToast = __webpack_require__(4);
+
+var _withToast2 = _interopRequireDefault(_withToast);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-//import IssueList from './IssueList.jsx';
-//import IssueEdit from './IssueEdit.jsx';
-
-//const contentNode = document.getElementById('contents');
-//const NoMatch = () => <p> Page Not Found </p>;
 
 //import ReactDOM from 'react-dom';
 //import { Router, Route, Redirect, browserHistory } from 'react-router';
-const Header = () => _react2.default.createElement(
+const Header = props => _react2.default.createElement(
   _reactBootstrap.Navbar,
   { fluid: true },
   _react2.default.createElement(
@@ -1687,12 +1688,7 @@ const Header = () => _react2.default.createElement(
   _react2.default.createElement(
     _reactBootstrap.Nav,
     { pullRight: true },
-    _react2.default.createElement(
-      _reactBootstrap.NavItem,
-      null,
-      _react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'plus' }),
-      ' Create Issue '
-    ),
+    _react2.default.createElement(_IssueAddNavItem2.default, { showError: props.showError }),
     _react2.default.createElement(
       _reactBootstrap.NavDropdown,
       { id: 'user-dropdown', title: _react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'option-horizontal' }), noCaret: true },
@@ -1705,10 +1701,15 @@ const Header = () => _react2.default.createElement(
   )
 );
 
+Header.propTypes = {
+  showError: _propTypes2.default.func.isRequired
+};
+const HeaderWithToast = (0, _withToast2.default)(Header);
+
 const App = props => _react2.default.createElement(
   'div',
   null,
-  _react2.default.createElement(Header, null),
+  _react2.default.createElement(HeaderWithToast, null),
   _react2.default.createElement(
     'div',
     { className: 'container-fluid' },
@@ -1770,7 +1771,221 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-__webpack_require__(25);
+var _propTypes = __webpack_require__(1);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _reactRouter = __webpack_require__(3);
+
+var _reactBootstrap = __webpack_require__(2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class IssueAddNavItem extends _react2.default.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showing: false
+    };
+    this.showModal = this.showModal.bind(this);
+    this.hideModal = this.hideModal.bind(this);
+    this.submit = this.submit.bind(this);
+  }
+
+  showModal() {
+    this.setState({ showing: true });
+  }
+
+  hideModal() {
+    this.setState({ showing: false });
+  }
+
+  submit(e) {
+    e.preventDefault();
+    this.hideModal();
+    const form = document.forms.issueAdd;
+    const newIssue = {
+      owner: form.owner.value, title: form.title.value,
+      status: 'New', created: new Date()
+    };
+    fetch('/api/issues', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newIssue)
+    }).then(response => {
+      if (response.ok) {
+        response.json().then(updatedIssue => {
+          this.props.router.push(`/issues/${updatedIssue._id}`);
+        });
+      } else {
+        response.json().then(error => {
+          this.props.showError(`Failed to add issue: ${error.message}`);
+        });
+      }
+    }).catch(err => {
+      this.props.showError(`Error in sending data to server: ${err.message}`);
+    });
+  }
+
+  render() {
+    return _react2.default.createElement(
+      _reactBootstrap.NavItem,
+      { onClick: this.showModal },
+      ' ',
+      _react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'plus' }),
+      'Create Issue',
+      _react2.default.createElement(
+        _reactBootstrap.Modal,
+        { keyboard: true, show: this.state.showing, onHide: this.hideModal },
+        _react2.default.createElement(
+          _reactBootstrap.Modal.Header,
+          { closeButton: true },
+          _react2.default.createElement(
+            _reactBootstrap.Modal.Title,
+            null,
+            ' Create Issue '
+          )
+        ),
+        _react2.default.createElement(
+          _reactBootstrap.Modal.Body,
+          null,
+          _react2.default.createElement(
+            _reactBootstrap.Form,
+            { name: 'issueAdd' },
+            _react2.default.createElement(
+              _reactBootstrap.FormGroup,
+              null,
+              _react2.default.createElement(
+                _reactBootstrap.ControlLabel,
+                null,
+                'Title'
+              ),
+              _react2.default.createElement(_reactBootstrap.FormControl, { name: 'title', autoFocus: true })
+            ),
+            _react2.default.createElement(
+              _reactBootstrap.FormGroup,
+              null,
+              _react2.default.createElement(
+                _reactBootstrap.ControlLabel,
+                null,
+                'Owner'
+              ),
+              _react2.default.createElement(_reactBootstrap.FormControl, { name: 'owner' })
+            )
+          )
+        ),
+        _react2.default.createElement(
+          _reactBootstrap.Modal.Footer,
+          null,
+          _react2.default.createElement(
+            _reactBootstrap.ButtonToolbar,
+            null,
+            _react2.default.createElement(
+              _reactBootstrap.Button,
+              { type: 'button', bsStyle: 'primary',
+                onClick: this.submit },
+              'Submit'
+            ),
+            _react2.default.createElement(
+              _reactBootstrap.Button,
+              { bsStyle: 'link', onClick: this.hideModal },
+              'Cancel'
+            )
+          )
+        )
+      )
+    );
+  }
+
+}
+
+IssueAddNavItem.propTypes = {
+  router: _propTypes2.default.object,
+  showError: _propTypes2.default.func.isRequired
+};
+
+exports.default = (0, _reactRouter.withRouter)(IssueAddNavItem);
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(1);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _reactBootstrap = __webpack_require__(2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class Toast extends _react2.default.Component {
+  ComponentDidUpdate() {
+    if (this.props.showing) {
+      clearTimeout(this.dismissTimer);
+      this.dismissTimer = setTimeout(this.props.onDismiss, 5000);
+    }
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.dismissTimer);
+  }
+
+  render() {
+    return _react2.default.createElement(
+      _reactBootstrap.Collapse,
+      { 'in': this.props.showing },
+      _react2.default.createElement(
+        'div',
+        { style: { position: 'fixed', top: 30, left: 0, right: 0, textAlign: 'center' } },
+        _react2.default.createElement(
+          _reactBootstrap.Alert,
+          { style: { display: 'inline-block', width: 500 }, bsStyle: this.props.bsStyle,
+            onDismiss: this.props.onDismiss },
+          this.props.message
+        )
+      )
+    );
+  }
+}
+
+exports.default = Toast;
+Toast.propTypes = {
+  showing: _propTypes2.default.bool.isRequired,
+  onDismiss: _propTypes2.default.func.isRequired,
+  bsStyle: _propTypes2.default.string,
+  message: _propTypes2.default.any.isRequired
+};
+
+Toast.defaultProps = {
+  bsStyle: 'success'
+};
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+__webpack_require__(27);
 
 var _propTypes = __webpack_require__(1);
 
@@ -1780,21 +1995,20 @@ var _reactRouter = __webpack_require__(3);
 
 var _reactBootstrap = __webpack_require__(2);
 
-var _IssueAdd = __webpack_require__(26);
-
-var _IssueAdd2 = _interopRequireDefault(_IssueAdd);
-
 var _IssueFilter = __webpack_require__(10);
 
 var _IssueFilter2 = _interopRequireDefault(_IssueFilter);
 
-var _Toast = __webpack_require__(5);
+var _withToast = __webpack_require__(4);
 
-var _Toast2 = _interopRequireDefault(_Toast);
+var _withToast2 = _interopRequireDefault(_withToast);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+//import IssueAdd from './IssueAdd.jsx';
 const PAGE_SIZE = 10;
+//import Toast from './Toast.jsx';
+
 
 const IssueRow = props => {
   function onDeleteClick() {
@@ -1956,32 +2170,19 @@ class IssueList extends _react2.default.Component {
         issue.completionDate = new Date(issue.completionDate);
       }
     });
-    this.state = { issues: issues, toastVisible: false,
-      toastMessage: '', toastType: 'success',
+    this.state = { issues: issues,
       totalCount: data.metadata.totalCount
     };
 
     this.selectPage = this.selectPage.bind(this);
-    this.createIssue = this.createIssue.bind(this);
+    //this.createIssue = this.createIssue.bind(this);
     this.setFilter = this.setFilter.bind(this);
     this.deleteIssue = this.deleteIssue.bind(this);
-    this.showError = this.showError.bind(this);
-    this.dismissToast = this.dismissToast.bind(this);
-  }
-
-  showError(message) {
-    this.setState({ toastVisible: true, toastMessage: message,
-      toastType: 'danger' });
-  }
-
-  dismissToast() {
-    get;
-    this.setState({ toastVisible: false });
   }
 
   deleteIssue(id) {
     fetch(`/api/issues/${id}`, { method: 'DELETE' }).then(response => {
-      if (!response.ok) alert('Failed to delete issue');else this.loadData();
+      if (!response.ok) this.props.showError('Failed to delete issue');else this.loadData();
     });
   }
 
@@ -2047,34 +2248,34 @@ class IssueList extends _react2.default.Component {
       this.setState({ issues: issues, totalCount: data.IssueList.metadata.total_count });
       console.log('satet:', issues);
     }).catch(err => {
-      this.showError(`Error in fetching data from server: ${err}`);
+      this.props.showError(`Error in fetching data from server: ${err}`);
     });
   }
 
-  createIssue(newIssue) {
-    fetch('/api/issues', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newIssue)
-    }).then(response => {
-      if (response.ok) {
-        response.json().then(updatedIssue => {
-          updatedIssue.created = new Date(updatedIssue.created);
-          if (updatedIssue.completionDate) {
-            updatedIssue.completionDate = new Date(updatedIssue.completionDate);
-          }
-          const newIssues = this.state.issues.concat(updatedIssue);
-          this.setState({ issues: newIssues });
-        });
-      } else {
-        response.json().then(error => {
-          this.showError(`Failed to add issue: ${error.message}`);
-        });
-      }
-    }).catch(err => {
-      this.showError(`Error in sending data to server: ${err.message}`);
-    });
-  }
+  // createIssue(newIssue) {
+  //   fetch('/api/issues', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify(newIssue),
+  //   }).then(response => {
+  //     if (response.ok) {
+  //       response.json().then(updatedIssue => {
+  //         updatedIssue.created = new Date(updatedIssue.created);
+  //         if (updatedIssue.completionDate) {
+  //           updatedIssue.completionDate = new Date(updatedIssue.completionDate);
+  //         }
+  //         const newIssues = this.state.issues.concat(updatedIssue);
+  //         this.setState({ issues: newIssues });
+  //       });
+  //     } else {
+  //       response.json().then(error => {
+  //         this.props.showError(`Failed to add issue: ${error.message}`);
+  //       });
+  //     }
+  //   }).catch(err => {
+  //     this.props.showError(`Error in sending data to server: ${err.message}`);
+  //   });
+  // }
 
   render() {
     console.log("issueList : ", this.state);
@@ -2092,10 +2293,7 @@ class IssueList extends _react2.default.Component {
         items: Math.ceil(this.state.totalCount / PAGE_SIZE),
         activePage: parseInt(this.props.location.query._page || '1', 10),
         onSelect: this.selectPage, maxButtons: 7, next: true, prev: true, boundaryLinks: true }),
-      _react2.default.createElement(IssueTable, { issues: this.state.issues, deleteIssue: this.deleteIssue }),
-      _react2.default.createElement(_IssueAdd2.default, { createIssue: this.createIssue }),
-      _react2.default.createElement(_Toast2.default, { showing: this.state.toastVisible, message: this.state.toastMessage,
-        onDismiss: this.dismissToast, bsStyle: this.state.toastType })
+      _react2.default.createElement(IssueTable, { issues: this.state.issues, deleteIssue: this.deleteIssue })
     );
   }
 }
@@ -2106,80 +2304,23 @@ IssueList.contextTypes = {
 
 IssueList.propTypes = {
   location: _propTypes2.default.object.isRequired,
-  router: _propTypes2.default.object
+  router: _propTypes2.default.object,
+  showError: _propTypes2.default.func.isRequired
 };
 
-exports.default = IssueList;
+const IssueListWithToast = (0, _withToast2.default)(IssueList);
+IssueListWithToast.dataFetcher = IssueList.dataFetcher;
+
+exports.default = IssueListWithToast;
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports) {
 
 module.exports = require("isomorphic-fetch");
 
 /***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactBootstrap = __webpack_require__(2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class IssueAdd extends _react2.default.Component {
-  constructor() {
-    super();
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleSubmit(e) {
-    e.preventDefault();
-    var form = document.forms.issueAdd;
-    this.props.createIssue({
-      owner: form.owner.value,
-      title: form.title.value,
-      status: 'New',
-      created: new Date()
-    });
-    //clear form for the next input
-    form.owner.value = "";
-    form.title.value = "";
-  }
-
-  render() {
-    return _react2.default.createElement(
-      'div',
-      null,
-      _react2.default.createElement(
-        _reactBootstrap.Form,
-        { inline: true, name: 'issueAdd', onSubmit: this.handleSubmit },
-        _react2.default.createElement(_reactBootstrap.FormControl, { name: 'owner', placeholder: 'Owner' }),
-        ' ',
-        _react2.default.createElement(_reactBootstrap.FormControl, { name: 'title', placeholder: 'Title' }),
-        ' ',
-        _react2.default.createElement(
-          _reactBootstrap.Button,
-          { type: 'submit', bsStyle: 'primary' },
-          'Add'
-        )
-      )
-    );
-  }
-}
-exports.default = IssueAdd;
-
-/***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2203,17 +2344,17 @@ var _reactRouterBootstrap = __webpack_require__(9);
 
 var _reactBootstrap = __webpack_require__(2);
 
-var _NumInput = __webpack_require__(28);
+var _NumInput = __webpack_require__(29);
 
 var _NumInput2 = _interopRequireDefault(_NumInput);
 
-var _DateInput = __webpack_require__(29);
+var _DateInput = __webpack_require__(30);
 
 var _DateInput2 = _interopRequireDefault(_DateInput);
 
-var _Toast = __webpack_require__(5);
+var _withToast = __webpack_require__(4);
 
-var _Toast2 = _interopRequireDefault(_Toast);
+var _withToast2 = _interopRequireDefault(_withToast);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2254,13 +2395,10 @@ class IssueEdit extends _react2.default.Component {
     this.state = {
       issue: issue,
       invalidFields: {},
-      showingValidation: false,
-      toastVisible: false, toastMessage: '', toastType: 'success'
+      showingValidation: false
     };
     this.dismissValidation = this.dismissValidation.bind(this);
     this.showValidation = this.showValidation.bind(this);
-    this.showSuccess = this.showSuccess.bind(this);
-    this.showError = this.showError.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onValidityChange = this.onValidityChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -2312,15 +2450,15 @@ class IssueEdit extends _react2.default.Component {
             updateIssue.completionDate = new Date(updateIssue.completionDate);
           }
           this.setState({ issue: updateIssue });
-          this.showSuccess('Updated issue successfully.');
+          this.props.showSuccess('Updated issue successfully.');
         });
       } else {
         response.json().then(error => {
-          this.showError(`Failed to update issue: ${error.message}`);
+          this.props.showError(`Failed to update issue: ${error.message}`);
         });
       }
     }).catch(err => {
-      this.showError(`Error in sending data to server: ${err.message}`);
+      this.props.showError(`Error in sending data to server: ${err.message}`);
     });
   }
 
@@ -2368,17 +2506,6 @@ class IssueEdit extends _react2.default.Component {
     });
   }
 
-  showSuccess(message) {
-    this.setState({ toastVisible: true, toastMessage: message, toastType: 'success' });
-  }
-
-  showError(message) {
-    this.setState({ toastVisible: true, toastMessage: message, toastType: 'danger' });
-  }
-
-  dismissToast() {
-    this.setState({ toastVisible: false });
-  }
   render() {
     const issue = this.state.issue;
     let validationMessage = null;
@@ -2557,25 +2684,30 @@ class IssueEdit extends _react2.default.Component {
             validationMessage
           )
         )
-      ),
-      _react2.default.createElement(_Toast2.default, { showing: this.state.toastVisible, message: this.state.toastMessage,
-        onDismiss: this.dismissToast, bsStyle: this.state.toastType })
+      )
     );
   }
 }
+//import Toast from './Toast.jsx';
+
 
 IssueEdit.contextTypes = {
   initialState: _react2.default.PropTypes.object
 };
 
-IssueEdit.PropTypes = {
-  params: _propTypes2.default.object.isRequired
+IssueEdit.propTypes = {
+  params: _propTypes2.default.object.isRequired,
+  showSuccess: _propTypes2.default.func.isRequired,
+  showError: _propTypes2.default.func.isRequired
 };
 
-exports.default = IssueEdit;
+const IssueEditWithToast = (0, _withToast2.default)(IssueEdit);
+IssueEditWithToast.dataFetcher = IssueEdit.dataFetcher;
+
+exports.default = IssueEditWithToast;
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2640,7 +2772,7 @@ NumInput.propTypes = {
 };
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2736,7 +2868,7 @@ DateInput.propTypes = {
 };
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2760,13 +2892,15 @@ var _IssueFilter = __webpack_require__(10);
 
 var _IssueFilter2 = _interopRequireDefault(_IssueFilter);
 
-var _Toast = __webpack_require__(5);
+var _withToast = __webpack_require__(4);
 
-var _Toast2 = _interopRequireDefault(_Toast);
+var _withToast2 = _interopRequireDefault(_withToast);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const statuses = ['New', 'Open', 'Assigned', 'Fixed', 'Verified', 'Closed'];
+//import Toast from './Toast.jsx';
+
 
 const StatRow = props => _react2.default.createElement(
   'tr',
@@ -2795,12 +2929,9 @@ class IssueReport extends _react2.default.Component {
     console.log("the context is : ", this.context);
     const stats = context.initialState ? context.initialState.IssueReport : {};
     this.state = {
-      stats: stats,
-      toastVisible: false, toastMessage: '', toastType: 'Success'
+      stats: stats
     };
     this.setFilter = this.setFilter.bind(this);
-    this.showError = this.showError.bind(this);
-    this.dismissToast = this.dismissToast.bind(this);
   }
 
   static dataFetcher(_ref) {
@@ -2833,19 +2964,11 @@ class IssueReport extends _react2.default.Component {
     this.props.router.push({ pathname: this.props.location.pathname, query: query });
   }
 
-  showError(message) {
-    this.setState({ toastVisible: true, toastMessage: message, toastType: 'danger' });
-  }
-
-  dismissToast() {
-    this.setState({ toastVisible: false });
-  }
-
   loadData() {
     IssueReport.dataFetcher({ location: this.props.location }).then(data => {
       this.setState({ stats: data.IssueReport });
     }).catch(err => {
-      this.showError(`Error in fetching data from server : ${error}`);
+      this.props.showError(`Error in fetching data from server : ${error}`);
     });
   }
 
@@ -2881,25 +3004,28 @@ class IssueReport extends _react2.default.Component {
           null,
           Object.keys(this.state.stats).map((owner, index) => _react2.default.createElement(StatRow, { key: index, owner: owner, counts: this.state.stats[owner] }))
         )
-      ),
-      _react2.default.createElement(_Toast2.default, { showing: this.state.toastVisible, message: this.state.toastMessage,
-        onDismiss: this.dismissToast, bsStyle: this.state.toastType })
+      )
     );
   }
 }
 
-exports.default = IssueReport;
 IssueReport.propTypes = {
   location: _propTypes2.default.object.isRequired,
-  router: _propTypes2.default.object
+  router: _propTypes2.default.object,
+  showError: _propTypes2.default.func.isRequired
 };
 
 IssueReport.contextTypes = {
   initialState: _propTypes2.default.object
 };
 
+const IssueReportWithToast = (0, _withToast2.default)(IssueReport);
+IssueReportWithToast.dataFetcher = IssueReport.dataFetcher;
+
+exports.default = IssueReportWithToast;
+
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2940,19 +3066,19 @@ ContextWrapper.propTypes = {
 };
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports) {
 
 module.exports = require("webpack-dev-middleware");
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports) {
 
 module.exports = require("webpack-hot-middleware");
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2995,7 +3121,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, "/"))
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(__resourceQuery) {/*
@@ -3014,7 +3140,7 @@ if(true) {
 					if(fromUpdate) log("info", "[HMR] Update applied.");
 					return;
 				}
-				__webpack_require__(36)(updatedModules, updatedModules);
+				__webpack_require__(37)(updatedModules, updatedModules);
 				checkForUpdate(true);
 			}).catch(function(err) {
 				var status = module.hot.status();
@@ -3036,7 +3162,7 @@ if(true) {
 /* WEBPACK VAR INJECTION */}.call(exports, "?1000"))
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
