@@ -23,7 +23,6 @@ renderedPageRouter.get('*', (req, res) =>{
 
     } else if(renderProps){
       const componentsWithData = renderProps.components.filter(c=> c.dataFetcher);
-      console.log("***** componentsWithData : ", renderProps);
       const dataFetchers = componentsWithData.map(c=> c.dataFetcher({
         params: renderProps.params,
         location: renderProps.location,

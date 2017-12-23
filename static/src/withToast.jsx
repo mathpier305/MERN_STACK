@@ -17,7 +17,12 @@ export default function withToast (OriginalComponent){
 
     showSuccess(message){
       this.setState({toastVisible: true, toastMessage: message,
-          toastType: 'danger'});
+          toastType: 'success'});
+    }
+
+    showError(message){
+      this.setState({toastVisible: true, toastMessage: message,
+                    toastType: 'danger'});
     }
 
     dismissToast(){
@@ -32,7 +37,7 @@ export default function withToast (OriginalComponent){
           {...this.props} />
 
         <Toast
-          showing={this.state.toastVisible} message={this.toastMessage}
+          showing={this.state.toastVisible} message={this.state.toastMessage}
           onDismiss={this.dismissToast} bsStyle={this.state.toastType} />
         </div>
       );

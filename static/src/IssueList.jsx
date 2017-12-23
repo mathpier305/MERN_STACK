@@ -183,7 +183,6 @@ class IssueList extends React.Component {
         }
       });
       this.setState({issues, totalCount: data.IssueList.metadata.total_count});
-      console.log('satet:',  issues);
     }).catch(err => {
        this.props.showError(`Error in fetching data from server: ${err}`);
      });
@@ -216,7 +215,6 @@ class IssueList extends React.Component {
   // }
 
   render() {
-    console.log("issueList : ", this.state);
     return (
       <div>
         <Panel collapsible header="Filter">

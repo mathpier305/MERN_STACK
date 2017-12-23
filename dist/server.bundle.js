@@ -20,11 +20,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-<<<<<<< HEAD
-/******/ 	var hotCurrentHash = "faa190f5026611f912a5"; // eslint-disable-line no-unused-vars
-=======
-/******/ 	var hotCurrentHash = "29e73ae9252f86879450"; // eslint-disable-line no-unused-vars
->>>>>>> 4ab3287
+/******/ 	var hotCurrentHash = "bec478268c9fd134953e"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -713,8 +709,7 @@ module.exports = require("react-bootstrap");
 module.exports = require("react-router");
 
 /***/ }),
-/* 4 */,
-/* 5 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -754,6 +749,11 @@ function withToast(OriginalComponent) {
 
     showSuccess(message) {
       this.setState({ toastVisible: true, toastMessage: message,
+        toastType: 'success' });
+    }
+
+    showError(message) {
+      this.setState({ toastVisible: true, toastMessage: message,
         toastType: 'danger' });
     }
 
@@ -769,7 +769,7 @@ function withToast(OriginalComponent) {
           showError: this.showError, showSuccess: this.showSuccess
         }, this.props)),
         _react2.default.createElement(_Toast2.default, {
-          showing: this.state.toastVisible, message: this.toastMessage,
+          showing: this.state.toastVisible, message: this.state.toastMessage,
           onDismiss: this.dismissToast, bsStyle: this.state.toastType })
       );
     }
@@ -888,6 +888,7 @@ app.get('/api/issues', (req, res) => {
   if (req.query.effort_lte || req.query.effort_gte) filter.effort = {};
   if (req.query.effort_lte) filter.effort.$lte = parseInt(req.query.effort_lte, 10);
   if (req.query.effort_gte) filter.effort.$gte = parseInt(req.query.effort_gte, 10);
+  if (req.query.search) filter.$text = { $search: req.query.search };
   if (req.query._summary === undefined) {
     const offset = req.query._offset ? parseInt(req.query._offset, 10) : 0;
     let limit = req.query.limit ? parseInt(req.query._limit, 10) : 20;
@@ -1496,7 +1497,6 @@ renderedPageRouter.get('*', (req, res) => {
       res.redirect(302, redirectLocation.pathname + redirectLocation.search);
     } else if (renderProps) {
       const componentsWithData = renderProps.components.filter(c => c.dataFetcher);
-      console.log("***** componentsWithData : ", renderProps);
       const dataFetchers = componentsWithData.map(c => c.dataFetcher({
         params: renderProps.params,
         location: renderProps.location,
@@ -1550,21 +1550,26 @@ function template(body, initialState) {
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+        <meta name="google-signin-client_id" content="vama50j9hj8rcg5omt0a6ra3h7fut7on.apps.googleusercontent.com">
         <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/react-select/dist/react-select.css" />
+        <script src="https://apis.google.com/js/platform.js" async defer></script>
         <style>
-        .aColor{
-          color:red;
-        }
+          .aColor{
+            color:red;
+          }
         .panel-title a {display:block; width: 100%; cursor: pointer;}
         </style>
         <body>
-          <div id="contents">{{{body}}}</div>
+          <div id="contents">${body}</div>
+
           <!--- this is where our component will appear -->
           <script>
             window.__INITIAL_STATE__ =${JSON.stringify(initialState)};
           </script>
           <script src="/vendor.bundle.js"></script>
           <script src="/app.bundle.js"></script>
+          <script src="/config.js"></script>
         </body>
       </html>`;
 }
@@ -1636,10 +1641,6 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _propTypes = __webpack_require__(1);
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
 var _reactBootstrap = __webpack_require__(2);
 
 var _reactRouterBootstrap = __webpack_require__(9);
@@ -1652,183 +1653,72 @@ var _withToast = __webpack_require__(4);
 
 var _withToast2 = _interopRequireDefault(_withToast);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _Header = __webpack_require__(38);
 
-//import ReactDOM from 'react-dom';
-//import { Router, Route, Redirect, browserHistory } from 'react-router';
-const Header = props => _react2.default.createElement(
-  _reactBootstrap.Navbar,
-  { fluid: true },
-  _react2.default.createElement(
-    _reactBootstrap.Navbar.Header,
-    null,
-    _react2.default.createElement(
-      _reactBootstrap.Navbar.Brand,
-      null,
-      ' Issue Tracker '
-    )
-  ),
-  _react2.default.createElement(
-    _reactBootstrap.Nav,
-    null,
-    _react2.default.createElement(
-      _reactRouterBootstrap.LinkContainer,
-      { to: '/issues' },
-      _react2.default.createElement(
-        _reactBootstrap.NavItem,
-        null,
-        'Issues'
-      )
-    ),
-    _react2.default.createElement(
-      _reactRouterBootstrap.LinkContainer,
-      { to: 'reports' },
-      _react2.default.createElement(
-        _reactBootstrap.NavItem,
-        null,
-        'reports '
-      )
-    )
-  ),
-  _react2.default.createElement(
-    _reactBootstrap.Nav,
-    { pullRight: true },
-    _react2.default.createElement(_IssueAddNavItem2.default, { showError: props.showError }),
-    _react2.default.createElement(
-      _reactBootstrap.NavDropdown,
-      { id: 'user-dropdown', title: _react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'option-horizontal' }), noCaret: true },
-      _react2.default.createElement(
-        _reactBootstrap.MenuItem,
-        null,
-        'Logout '
-      )
-    )
-  )
-);
-
-Header.propTypes = {
-  showError: _propTypes2.default.func.isRequired
-};
-const HeaderWithToast = (0, _withToast2.default)(Header);
-
-const App = props => _react2.default.createElement(
-  'div',
-  null,
-  _react2.default.createElement(HeaderWithToast, null),
-  _react2.default.createElement(
-    'div',
-    { className: 'container-fluid' },
-    props.children,
-    _react2.default.createElement('hr', null),
-    _react2.default.createElement(
-      'h5',
-      null,
-      ' ',
-      _react2.default.createElement(
-        'small',
-        null,
-        'Full source code available at  this',
-        _react2.default.createElement(
-          'a',
-          { href: 'https://github.com/vasansr/prop-mern-stack' },
-          'Github Repository'
-        )
-      )
-    )
-  )
-);
-
-App.propTypes = {
-  children: _propTypes2.default.object.isRequired
-};
-
-// const RoutedApp = () => (
-//   <Router history={browserHistory} >
-//     <Redirect from="/" to="/issues" />
-//     <Route path="/" component={App} >
-//       <Route path="issues" component={IssueList} />
-//       <Route path="issues/:id" component={IssueEdit} />
-//       <Route path="*" component={NoMatch} />
-//     </Route>
-//   </Router>
-// );
-
-// ReactDOM.render(<RoutedApp />, contentNode);
-//
-// if(module.hot){
-//   module.hot.accept();
-// }
-
-exports.default = App;
-
-/***/ }),
-/* 24 */,
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = __webpack_require__(1);
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _reactBootstrap = __webpack_require__(2);
+var _Header2 = _interopRequireDefault(_Header);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-class Toast extends _react2.default.Component {
-  ComponentDidUpdate() {
-    if (this.props.showing) {
-      clearTimeout(this.dismissTimer);
-      this.dismissTimer = setTimeout(this.props.onDismiss, 5000);
-    }
+//const HeaderWithToast = withToast(Header);
+class App extends _react2.default.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: { signedIn: false, name: '' }
+    };
+    this.onSignin = this.onSignin.bind(this);
+    this.onSignout = this.onSignout.bind(this);
   }
 
-  componentWillUnmount() {
-    clearTimeout(this.dismissTimer);
+  onSignin(name) {
+    this.setState({ user: { signedIn: true, name: name } });
+  }
+
+  onSignout(name) {
+    this.setState({ user: { signedIn: false, name: '' } });
   }
 
   render() {
     return _react2.default.createElement(
-      _reactBootstrap.Collapse,
-      { 'in': this.props.showing },
+      'div',
+      null,
+      _react2.default.createElement(_Header2.default, { user: this.state.user, onSignin: this.onSignin,
+        onSignout: this.onSignout }),
       _react2.default.createElement(
         'div',
-        { style: { position: 'fixed', top: 30, left: 0, right: 0, textAlign: 'center' } },
+        { className: 'container-fluid' },
+        this.props.children,
+        _react2.default.createElement('hr', null),
         _react2.default.createElement(
-          _reactBootstrap.Alert,
-          { style: { display: 'inline-block', width: 500 }, bsStyle: this.props.bsStyle,
-            onDismiss: this.props.onDismiss },
-          this.props.message
+          'h5',
+          null,
+          _react2.default.createElement(
+            'small',
+            null,
+            'Full source code available at  this',
+            _react2.default.createElement(
+              'a',
+              { href: 'https://github.com/vasansr/prop-mern-stack' },
+              'Github Repository'
+            )
+          )
         )
       )
     );
   }
 }
 
-exports.default = Toast;
-Toast.propTypes = {
-  showing: _propTypes2.default.bool.isRequired,
-  onDismiss: _propTypes2.default.func.isRequired,
-  bsStyle: _propTypes2.default.string,
-  message: _propTypes2.default.any.isRequired
-};
+exports.default = App;
 
-Toast.defaultProps = {
-  bsStyle: 'success'
+//import ReactDOM from 'react-dom';
+//import { Router, Route, Redirect, browserHistory } from 'react-router';
+
+App.propTypes = {
+  children: _react2.default.PropTypes.object.isRequired
 };
 
 /***/ }),
-/* 26 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1842,11 +1732,6 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-<<<<<<< HEAD
-__webpack_require__(27);
-
-=======
->>>>>>> 4ab3287
 var _propTypes = __webpack_require__(1);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
@@ -1855,9 +1740,6 @@ var _reactRouter = __webpack_require__(3);
 
 var _reactBootstrap = __webpack_require__(2);
 
-<<<<<<< HEAD
-var _IssueAdd = __webpack_require__(38);
-=======
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class IssueAddNavItem extends _react2.default.Component {
@@ -2054,7 +1936,6 @@ Toast.defaultProps = {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
->>>>>>> 4ab3287
 
 
 Object.defineProperty(exports, "__esModule", {
@@ -2079,11 +1960,7 @@ var _IssueFilter = __webpack_require__(10);
 
 var _IssueFilter2 = _interopRequireDefault(_IssueFilter);
 
-<<<<<<< HEAD
-var _Toast = __webpack_require__(25);
-=======
 var _withToast = __webpack_require__(4);
->>>>>>> 4ab3287
 
 var _withToast2 = _interopRequireDefault(_withToast);
 
@@ -2330,7 +2207,6 @@ class IssueList extends _react2.default.Component {
         }
       });
       this.setState({ issues: issues, totalCount: data.IssueList.metadata.total_count });
-      console.log('satet:', issues);
     }).catch(err => {
       this.props.showError(`Error in fetching data from server: ${err}`);
     });
@@ -2362,7 +2238,6 @@ class IssueList extends _react2.default.Component {
   // }
 
   render() {
-    console.log("issueList : ", this.state);
     return _react2.default.createElement(
       'div',
       null,
@@ -2436,11 +2311,7 @@ var _DateInput = __webpack_require__(30);
 
 var _DateInput2 = _interopRequireDefault(_DateInput);
 
-<<<<<<< HEAD
-var _Toast = __webpack_require__(25);
-=======
 var _withToast = __webpack_require__(4);
->>>>>>> 4ab3287
 
 var _withToast2 = _interopRequireDefault(_withToast);
 
@@ -2732,7 +2603,7 @@ class IssueEdit extends _react2.default.Component {
           _react2.default.createElement(
             _reactBootstrap.Col,
             { sm: 9 },
-            _react2.default.createElement(_reactBootstrap.FormControl, { componentClass: _DateInput2.default, name: 'completionDate', value: this.state.issue.completionDate,
+            _react2.default.createElement(_reactBootstrap.FormControl, { componentClass: _DateInput2.default, name: 'completionDate', value: issue.completionDate,
               onChange: this.onChange, onValidityChange: this.onValidityChange }),
             _react2.default.createElement(_reactBootstrap.FormControl.Feedback, null)
           )
@@ -2972,27 +2843,17 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactBootstrap = __webpack_require__(2);
 
-var _propTypes = __webpack_require__(1);
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
 var _IssueFilter = __webpack_require__(10);
 
 var _IssueFilter2 = _interopRequireDefault(_IssueFilter);
 
-<<<<<<< HEAD
-var _Toast = __webpack_require__(25);
-=======
 var _withToast = __webpack_require__(4);
->>>>>>> 4ab3287
 
 var _withToast2 = _interopRequireDefault(_withToast);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const statuses = ['New', 'Open', 'Assigned', 'Fixed', 'Verified', 'Closed'];
-//import Toast from './Toast.jsx';
-
 
 const StatRow = props => _react2.default.createElement(
   'tr',
@@ -3010,16 +2871,25 @@ const StatRow = props => _react2.default.createElement(
 );
 
 StatRow.propTypes = {
-  owner: _propTypes2.default.string.isRequired,
-  counts: _propTypes2.default.object.isRequired
+  owner: _react2.default.PropTypes.string.isRequired,
+  counts: _react2.default.PropTypes.object.isRequired
 };
 
 class IssueReport extends _react2.default.Component {
+  static dataFetcher(_ref) {
+    let urlBase = _ref.urlBase,
+        location = _ref.location;
+
+    const search = location.search ? `${location.search}&_summary` : '?_summary';
+    return fetch(`${urlBase || ''}/api/issues${search}`).then(response => {
+      if (!response.ok) return response.json().then(error => Promise.reject(error));
+      return response.json().then(data => ({ IssueReport: data }));
+    });
+  }
+
   constructor(props, context) {
     super(props, context);
-    console.log('contexL: ', context);
-    console.log("the context is : ", this.context);
-    const stats = context.initialState ? context.initialState.IssueReport : {};
+    const stats = context.initialState.IssueReport ? context.initialState.IssueReport : {};
     this.state = {
       stats: stats
     };
@@ -3048,7 +2918,7 @@ class IssueReport extends _react2.default.Component {
     IssueReport.dataFetcher({ location: this.props.location }).then(data => {
       this.setState({ stats: data.IssueReport });
     }).catch(err => {
-      this.props.showError(`Error in fetching data from server : ${error}`);
+      this.props.showError(`Error in fetching data from server: ${err}`);
     });
   }
 
@@ -3074,7 +2944,6 @@ class IssueReport extends _react2.default.Component {
             statuses.map((status, index) => _react2.default.createElement(
               'td',
               { key: index },
-              ' ',
               status
             ))
           )
@@ -3090,13 +2959,13 @@ class IssueReport extends _react2.default.Component {
 }
 
 IssueReport.propTypes = {
-  location: _propTypes2.default.object.isRequired,
-  router: _propTypes2.default.object,
-  showError: _propTypes2.default.func.isRequired
+  location: _react2.default.PropTypes.object.isRequired,
+  router: _react2.default.PropTypes.object,
+  showError: _react2.default.PropTypes.func.isRequired
 };
 
 IssueReport.contextTypes = {
-  initialState: _propTypes2.default.object
+  initialState: _react2.default.PropTypes.object
 };
 
 const IssueReportWithToast = (0, _withToast2.default)(IssueReport);
@@ -3302,49 +3171,273 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactBootstrap = __webpack_require__(2);
 
+var _reactRouterBootstrap = __webpack_require__(9);
+
+var _reactRouter = __webpack_require__(3);
+
+var _reactSelect = __webpack_require__(39);
+
+var _reactSelect2 = _interopRequireDefault(_reactSelect);
+
+var _IssueAddNavItem = __webpack_require__(24);
+
+var _IssueAddNavItem2 = _interopRequireDefault(_IssueAddNavItem);
+
+var _withToast = __webpack_require__(4);
+
+var _withToast2 = _interopRequireDefault(_withToast);
+
+var _SigninNavItem = __webpack_require__(40);
+
+var _SigninNavItem2 = _interopRequireDefault(_SigninNavItem);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-class IssueAdd extends _react2.default.Component {
-  constructor() {
-    super();
-    this.handleSubmit = this.handleSubmit.bind(this);
+const Header = props => {
+  function searchIssues(input) {
+    if (input.length < 2) return Promise.resolve({ options: [] });
+
+    return fetch(`/api/issues?search=${input}`).then(response => {
+      if (!response.ok) return response.json().then(error => Promise.reject(error));
+      return response.json().then(data => {
+        const options = data.records.map(issue => ({
+          value: issue._id,
+          label: `${issue._id.substr(-4)}: ${issue.title}`
+        }));
+        return { options: options };
+      }).catch(error => {
+        this.props.showError(`Error fetching data from server: ${error}`);
+      });
+    });
   }
 
-  handleSubmit(e) {
-    e.preventDefault();
-    var form = document.forms.issueAdd;
-    this.props.createIssue({
-      owner: form.owner.value,
-      title: form.title.value,
-      status: 'New',
-      created: new Date()
+  function filterOptions(options) {
+    return options;
+  }
+
+  function selectIssue(item) {
+    if (item) props.router.push(`/issues/${item.value}`);
+  }
+
+  return _react2.default.createElement(
+    _reactBootstrap.Navbar,
+    { fluid: true },
+    _react2.default.createElement(
+      _reactBootstrap.Col,
+      { sm: 5 },
+      _react2.default.createElement(
+        _reactBootstrap.Navbar.Header,
+        null,
+        _react2.default.createElement(
+          _reactBootstrap.Navbar.Brand,
+          null,
+          'Issue Tracker'
+        )
+      ),
+      _react2.default.createElement(
+        _reactBootstrap.Nav,
+        null,
+        _react2.default.createElement(
+          _reactRouterBootstrap.LinkContainer,
+          { to: '/issues' },
+          _react2.default.createElement(
+            _reactBootstrap.NavItem,
+            null,
+            'Issues'
+          )
+        ),
+        _react2.default.createElement(
+          _reactRouterBootstrap.LinkContainer,
+          { to: '/reports' },
+          _react2.default.createElement(
+            _reactBootstrap.NavItem,
+            null,
+            'Reports'
+          )
+        )
+      )
+    ),
+    _react2.default.createElement(
+      _reactBootstrap.Col,
+      { sm: 4 },
+      _react2.default.createElement(
+        'div',
+        { style: { paddingTop: 8 } },
+        _react2.default.createElement(_reactSelect2.default.Async, {
+          instanceId: 'search', placeholder: 'Search ...', autoload: false, cache: false,
+          loadOptions: searchIssues, filterOptions: filterOptions, onChange: selectIssue
+        })
+      )
+    ),
+    _react2.default.createElement(
+      _reactBootstrap.Col,
+      { sm: 3 },
+      _react2.default.createElement(
+        _reactBootstrap.Nav,
+        { pullRight: true },
+        _react2.default.createElement(_IssueAddNavItem2.default, { showError: props.showError }),
+        _react2.default.createElement(_SigninNavItem2.default, { user: props.user, onSignin: props.onSignin,
+          onSignout: props.onSignout,
+          showError: props.showError, showSuccess: props.showSuccess })
+      )
+    )
+  );
+};
+
+Header.propTypes = {
+  showError: _react2.default.PropTypes.func.isRequired,
+  router: _react2.default.PropTypes.object,
+  showSuccess: _react2.default.PropTypes.func.isRequired,
+  onSignin: _react2.default.PropTypes.func.isRequired,
+  onSignout: _react2.default.PropTypes.func.isRequired,
+  user: _react2.default.PropTypes.object
+};
+
+exports.default = (0, _reactRouter.withRouter)((0, _withToast2.default)(Header));
+
+/***/ }),
+/* 39 */
+/***/ (function(module, exports) {
+
+module.exports = require("react-select");
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactBootstrap = __webpack_require__(2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class SigninNavItem extends _react2.default.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showing: false, disabled: true
+    };
+    this.showModal = this.showModal.bind(this);
+    this.hideModal = this.hideModal.bind(this);
+    this.signout = this.signout.bind(this);
+    this.signin = this.signin.bind(this);
+  }
+
+  componentDidMount() {
+    window.gapi.load('auth2', () => {
+      if (!window.gapi.auth2.getAuthInstance()) {
+        if (!window.config || !window.config.googleClientId) {
+          this.props.showError('Missing Google Client Id or  config file /static/config.js');
+        } else {
+          window.gapi.auth2.init({ client_id: window.config.googleClientId }).then(() => {
+            this.setState({ disabled: false });
+          });
+        }
+      }
     });
-    //clear form for the next input
-    form.owner.value = "";
-    form.title.value = "";
+  }
+
+  signin() {
+    this.hideModal();
+    const auth2 = window.gapi.auth2.getAuthInstance();
+    auth2.signIn().then(googleUser => {
+      const name = googleUser.getBasicProfile().getGivenName();
+      console.log("signed in success - name : ", name);
+      this.props.onSignin(name);
+    }, error => {
+      this.props.showError(`Error authentication with Google ${error}`);
+    });
+  }
+
+  signout() {
+    const auth2 = window.gapi.auth2.getAuthInstance();
+    auth2.signOut().then(response => {
+      this.props.showSuccess('Successfully signed out.');
+      this.props.onSignout();
+    });
+  }
+
+  showModal() {
+    if (this.state.disabled) {
+      this.props.showError('Missing Google Client Id or config file /static/config.js ');
+    } else {
+      this.setState({ showing: true });
+    }
+  }
+
+  hideModal() {
+    this.setState({ showing: false });
   }
 
   render() {
-    return _react2.default.createElement(
-      'div',
-      null,
-      _react2.default.createElement(
-        _reactBootstrap.Form,
-        { inline: true, name: 'issueAdd', onSubmit: this.handleSubmit },
-        _react2.default.createElement(_reactBootstrap.FormControl, { name: 'owner', placeholder: 'Owner' }),
-        ' ',
-        _react2.default.createElement(_reactBootstrap.FormControl, { name: 'title', placeholder: 'Title' }),
-        ' ',
+    if (this.props.user.signedIn) {
+      return _react2.default.createElement(
+        _reactBootstrap.NavDropdown,
+        { title: this.props.user.name, id: 'user-dropdown' },
         _react2.default.createElement(
-          _reactBootstrap.Button,
-          { type: 'submit', bsStyle: 'primary' },
-          'Add'
+          _reactBootstrap.MenuItem,
+          { onClick: this.signout },
+          'Sign out'
+        )
+      );
+    }
+    return _react2.default.createElement(
+      _reactBootstrap.NavItem,
+      { onClick: this.showModal },
+      ' Sign In',
+      _react2.default.createElement(
+        _reactBootstrap.Modal,
+        { keyboard: true, show: this.state.showing, onHide: this.hideModal,
+          bsSize: 'sm' },
+        _react2.default.createElement(
+          _reactBootstrap.Modal.Header,
+          { closeButton: true },
+          _react2.default.createElement(
+            _reactBootstrap.Modal.Title,
+            null,
+            'Sign In'
+          )
+        ),
+        _react2.default.createElement(
+          _reactBootstrap.Modal.Body,
+          null,
+          _react2.default.createElement(
+            _reactBootstrap.Button,
+            { block: true, disabled: this.state.disabled, onClick: this.signin },
+            _react2.default.createElement('img', { src: '/btn_google_signin_dark_normal_web.png', alt: 'Signin' })
+          )
+        ),
+        _react2.default.createElement(
+          _reactBootstrap.Modal.Footer,
+          null,
+          _react2.default.createElement(
+            _reactBootstrap.Button,
+            { bsStyle: 'link', onClick: this.hideModal },
+            'Cancel '
+          )
         )
       )
     );
   }
 }
-exports.default = IssueAdd;
+
+exports.default = SigninNavItem;
+SigninNavItem.propTypes = {
+  user: _react2.default.PropTypes.object,
+  onSignin: _react2.default.PropTypes.func.isRequired,
+  onSignout: _react2.default.PropTypes.func.isRequired,
+  showError: _react2.default.PropTypes.func.isRequired,
+  showSuccess: _react2.default.PropTypes.func.isRequired
+};
 
 /***/ })
 /******/ ])));

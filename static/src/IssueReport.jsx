@@ -1,9 +1,7 @@
 import React from 'react';
-import {Panel, Table } from 'react-bootstrap';
-import PropTypes from 'prop-types';
+import { Panel, Table } from 'react-bootstrap';
 
 import IssueFilter from './IssueFilter.jsx';
-//import Toast from './Toast.jsx';
 import withToast from './withToast.jsx';
 
 const statuses = ['New', 'Open', 'Assigned', 'Fixed', 'Verified', 'Closed'];
@@ -11,33 +9,38 @@ const statuses = ['New', 'Open', 'Assigned', 'Fixed', 'Verified', 'Closed'];
 const StatRow = (props) => (
   <tr>
     <td>{props.owner}</td>
-    {statuses.map((status, index)=>(<td key={index}>{props.counts[status]}</td>))}
+    {statuses.map((status, index) => (<td key={index}>{props.counts[status]}</td>))}
   </tr>
 );
 
 StatRow.propTypes = {
-  owner: PropTypes.string.isRequired,
-  counts: PropTypes.object.isRequired,
+  owner: React.PropTypes.string.isRequired,
+  counts: React.PropTypes.object.isRequired,
 };
 
+class IssueReport extends React.Component {
+  static dataFetcher({urlBase, location}) {
+    const search= location.search ? `${location.search}&_summary` : '?_summary';
+    return fetch(`${urlBase || ''}/api/issues${search}`).then(response=>{
+      if(!response.ok) return response.json().then(error=> Promise.reject(error));
+      return response.json().then(data=>({IssueReport: data}));
+    });
+  }
 
-class IssueReport extends React.Component{
-  constructor(props, context){
+  constructor(props, context) {
     super(props, context);
-    console.log('contexL: ', context);
-    console.log("the context is : ", this.context);
-    const stats = context.initialState ? context.initialState.IssueReport : {};
+    const stats = context.initialState.IssueReport ? context.initialState.IssueReport : {};
     this.state = {
       stats,
     };
     this.setFilter = this.setFilter.bind(this);
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.loadData();
   }
 
-  componentDidUpdate(prevProps){
+  componentDidUpdate(prevProps) {
     const oldQuery = prevProps.location.query;
     const newQuery = this.props.location.query;
 
@@ -48,19 +51,20 @@ class IssueReport extends React.Component{
   }
 
   setFilter(query){
-    this.props.router.push({pathname: this.props.location.pathname, query});
+    this.props.router.push({ pathname: this.props.location.pathname, query});
   }
 
 
-  loadData(){
-    IssueReport.dataFetcher({location: this.props.location}).then(data=>{
-      this.setState({stats: data.IssueReport});
-    }).catch(err=>{
-      this.props.showError(`Error in fetching data from server : ${error}`);
+  loadData() {
+    IssueReport.dataFetcher({ location: this.props.location })
+    .then(data => {
+      this.setState({ stats: data.IssueReport });
+    }).catch(err => {
+      this.props.showError(`Error in fetching data from server: ${err}`);
     });
   }
 
-  render(){
+  render() {
     return(
       <div>
         <Panel collapsible header="Filter">
@@ -70,13 +74,13 @@ class IssueReport extends React.Component{
           <thead>
             <tr>
               <th></th>
-              {statuses.map((status, index)=> <td key={index}> {status}</td>)}
+              {statuses.map((status, index) => <td key={index}>{status}</td>)}
             </tr>
           </thead>
           <tbody>
-            {Object.keys(this.state.stats).map((owner, index)=>
-            <StatRow key={index} owner={owner} counts={this.state.stats[owner]} />
-          )}
+            {Object.keys(this.state.stats).map((owner, index) =>
+              <StatRow key={index} owner={owner} counts={this.state.stats[owner]} />
+            )}
           </tbody>
         </Table>
       </div>
@@ -84,14 +88,14 @@ class IssueReport extends React.Component{
   }
 }
 
-IssueReport.propTypes ={
-  location: PropTypes.object.isRequired,
-  router: PropTypes.object,
-  showError: PropTypes.func.isRequired,
+IssueReport.propTypes = {
+  location: React.PropTypes.object.isRequired,
+  router: React.PropTypes.object,
+  showError: React.PropTypes.func.isRequired,
 };
 
-IssueReport.contextTypes={
-  initialState: PropTypes.object,
+IssueReport.contextTypes = {
+  initialState: React.PropTypes.object,
 };
 
 const IssueReportWithToast = withToast(IssueReport);
