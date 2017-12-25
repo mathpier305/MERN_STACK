@@ -20,7 +20,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "bec478268c9fd134953e"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "2ff455e51cd4c4d74ad9"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -681,7 +681,7 @@
 /******/ 	__webpack_require__.h = function() { return hotCurrentHash; };
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return hotCreateRequire(13)(__webpack_require__.s = 13);
+/******/ 	return hotCreateRequire(14)(__webpack_require__.s = 14);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -694,13 +694,13 @@ module.exports = require("react");
 /* 1 */
 /***/ (function(module, exports) {
 
-module.exports = require("prop-types");
+module.exports = require("react-bootstrap");
 
 /***/ }),
 /* 2 */
 /***/ (function(module, exports) {
 
-module.exports = require("react-bootstrap");
+module.exports = require("prop-types");
 
 /***/ }),
 /* 3 */
@@ -788,34 +788,89 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.setDB = exports.app = undefined;
 
-var _express = __webpack_require__(8);
+var _express = __webpack_require__(9);
 
 var _express2 = _interopRequireDefault(_express);
 
-var _bodyParser = __webpack_require__(17);
+var _bodyParser = __webpack_require__(18);
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
 
-var _mongodb = __webpack_require__(7);
+var _expressSession = __webpack_require__(41);
 
-var _issue = __webpack_require__(18);
+var _expressSession2 = _interopRequireDefault(_expressSession);
+
+var _mongodb = __webpack_require__(8);
+
+var _issue = __webpack_require__(19);
 
 var _issue2 = _interopRequireDefault(_issue);
 
-var _renderedPageRouter = __webpack_require__(19);
+var _renderedPageRouter = __webpack_require__(20);
 
 var _renderedPageRouter2 = _interopRequireDefault(_renderedPageRouter);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const app = (0, _express2.default)(); // import SourceMapSupport from 'source-map-support';
+// import SourceMapSupport from 'source-map-support';
 // SourceMapSupport.install();
 // import 'babel-polyfill';
 
 //import path from 'path';
-
+const app = (0, _express2.default)();
 app.use(_express2.default.static('static'));
 app.use(_bodyParser2.default.json());
+app.use((0, _expressSession2.default)({ secret: 'h7e3f5s6', resave: false,
+  saveUninitialized: true }));
+
+app.all('/api/*', (req, res, next) => {
+  if (req.method === 'DELETE' || req.method === 'POST' || req.method === 'PUT') {
+    if (!req.session || !req.session.user) {
+      console.log("the session is : ", req.session);
+      res.status(403).send({
+        message: 'You are not authorized to perform the operation'
+      });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+});
+
+app.get('/api/users/me', (req, res) => {
+  if (req.session && req.session.user) {
+    res.json(req.session.user);
+  } else {
+    res.json({ signedIn: false, name: '' });
+  }
+});
+
+app.post('/signin', (req, res) => {
+  if (!req.body.id_token) {
+    res.status(400).send({ code: 400, message: 'Missing token. ' });
+    return;
+  }
+  console.log("tried to sign in  -- session ", req.body.id_token);
+  fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${req.body.id_token}`).then(response => {
+    if (!response.ok) response.json().then(error => Promise.reject(error));
+    response.json().then(data => {
+      req.session.user = {
+        signedIn: true, name: data.given_name
+      };
+      console.log("signed in successfully  -- session ", req.session);
+      res.json(req.session.user);
+    });
+  }).catch(error => {
+    console.log(error);
+    res.status(500).json({ message: `Internal Server error ${error}` });
+  });
+});
+
+app.post('/signout', (req, res) => {
+  if (req.session) req.session.destroy();
+  res.json({ status: 'ok' });
+});
 
 // app.use(bodyParser.urlencoded({extended: true}));
 // app.use(bodyParser.json({type: 'application/*+json'}));
@@ -826,11 +881,11 @@ app.use(_bodyParser2.default.json());
 let db;
 
 if (process.env.NODE_ENV !== 'production') {
-  const webpack = __webpack_require__(11);
-  const webpackDevMiddleware = __webpack_require__(33);
-  const webpackHotMiddleware = __webpack_require__(34);
+  const webpack = __webpack_require__(12);
+  const webpackDevMiddleware = __webpack_require__(36);
+  const webpackHotMiddleware = __webpack_require__(37);
 
-  const config = __webpack_require__(35);
+  const config = __webpack_require__(38);
   config.entry.app.push('webpack-hot-middleware/client', 'webpack/hot/only-dev-server');
   config.plugins.push(new webpack.HotModuleReplacementPlugin());
 
@@ -840,6 +895,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 app.delete('/api/issues/:id', (req, res) => {
+  console.log("server -- trying to delete issue  ");
   let issueId;
   try {
     issueId = new _mongodb.ObjectId(req.params.id);
@@ -1002,25 +1058,25 @@ exports.setDB = setDB;
 /* 6 */
 /***/ (function(module, exports) {
 
-module.exports = require("babel-polyfill");
+module.exports = require("react-router-bootstrap");
 
 /***/ }),
 /* 7 */
 /***/ (function(module, exports) {
 
-module.exports = require("mongodb");
+module.exports = require("babel-polyfill");
 
 /***/ }),
 /* 8 */
 /***/ (function(module, exports) {
 
-module.exports = require("express");
+module.exports = require("mongodb");
 
 /***/ }),
 /* 9 */
 /***/ (function(module, exports) {
 
-module.exports = require("react-router-bootstrap");
+module.exports = require("express");
 
 /***/ }),
 /* 10 */
@@ -1037,13 +1093,162 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _propTypes = __webpack_require__(1);
+var _propTypes = __webpack_require__(2);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
 var _reactRouter = __webpack_require__(3);
 
-var _reactBootstrap = __webpack_require__(2);
+var _reactBootstrap = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class IssueAddNavItem extends _react2.default.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showing: false
+    };
+    this.showModal = this.showModal.bind(this);
+    this.hideModal = this.hideModal.bind(this);
+    this.submit = this.submit.bind(this);
+  }
+
+  showModal() {
+    this.setState({ showing: true });
+  }
+
+  hideModal() {
+    this.setState({ showing: false });
+  }
+
+  submit(e) {
+    e.preventDefault();
+    this.hideModal();
+    const form = document.forms.issueAdd;
+    const newIssue = {
+      owner: form.owner.value, title: form.title.value,
+      status: 'New', created: new Date()
+    };
+    fetch('/api/issues', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newIssue)
+    }).then(response => {
+      if (response.ok) {
+        response.json().then(updatedIssue => {
+          this.props.router.push(`/issues/${updatedIssue._id}`);
+        });
+      } else {
+        response.json().then(error => {
+          this.props.showError(`Failed to add issue: ${error.message}`);
+        });
+      }
+    }).catch(err => {
+      this.props.showError(`Error in sending data to server: ${err.message}`);
+    });
+  }
+
+  render() {
+    return _react2.default.createElement(
+      _reactBootstrap.NavItem,
+      { onClick: this.showModal },
+      ' ',
+      _react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'plus' }),
+      'Create Issue',
+      _react2.default.createElement(
+        _reactBootstrap.Modal,
+        { keyboard: true, show: this.state.showing, onHide: this.hideModal },
+        _react2.default.createElement(
+          _reactBootstrap.Modal.Header,
+          { closeButton: true },
+          _react2.default.createElement(
+            _reactBootstrap.Modal.Title,
+            null,
+            ' Create Issue '
+          )
+        ),
+        _react2.default.createElement(
+          _reactBootstrap.Modal.Body,
+          null,
+          _react2.default.createElement(
+            _reactBootstrap.Form,
+            { name: 'issueAdd' },
+            _react2.default.createElement(
+              _reactBootstrap.FormGroup,
+              null,
+              _react2.default.createElement(
+                _reactBootstrap.ControlLabel,
+                null,
+                'Title'
+              ),
+              _react2.default.createElement(_reactBootstrap.FormControl, { name: 'title', autoFocus: true })
+            ),
+            _react2.default.createElement(
+              _reactBootstrap.FormGroup,
+              null,
+              _react2.default.createElement(
+                _reactBootstrap.ControlLabel,
+                null,
+                'Owner'
+              ),
+              _react2.default.createElement(_reactBootstrap.FormControl, { name: 'owner' })
+            )
+          )
+        ),
+        _react2.default.createElement(
+          _reactBootstrap.Modal.Footer,
+          null,
+          _react2.default.createElement(
+            _reactBootstrap.ButtonToolbar,
+            null,
+            _react2.default.createElement(
+              _reactBootstrap.Button,
+              { type: 'button', bsStyle: 'primary',
+                onClick: this.submit },
+              'Submit'
+            ),
+            _react2.default.createElement(
+              _reactBootstrap.Button,
+              { bsStyle: 'link', onClick: this.hideModal },
+              'Cancel'
+            )
+          )
+        )
+      )
+    );
+  }
+
+}
+
+IssueAddNavItem.propTypes = {
+  router: _propTypes2.default.object,
+  showError: _propTypes2.default.func.isRequired
+};
+
+exports.default = (0, _reactRouter.withRouter)(IssueAddNavItem);
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(2);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _reactRouter = __webpack_require__(3);
+
+var _reactBootstrap = __webpack_require__(1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1251,13 +1456,13 @@ IssueFilter.propTypes = {
 };
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 module.exports = require("webpack");
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 var logLevel = "info";
@@ -1307,31 +1512,31 @@ module.exports.setLogLevel = function(level) {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(14);
-module.exports = __webpack_require__(36);
+__webpack_require__(15);
+module.exports = __webpack_require__(39);
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _sourceMapSupport = __webpack_require__(15);
+var _sourceMapSupport = __webpack_require__(16);
 
 var _sourceMapSupport2 = _interopRequireDefault(_sourceMapSupport);
 
-__webpack_require__(6);
+__webpack_require__(7);
 
-var _http = __webpack_require__(16);
+var _http = __webpack_require__(17);
 
 var _http2 = _interopRequireDefault(_http);
 
-var _mongodb = __webpack_require__(7);
+var _mongodb = __webpack_require__(8);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1364,25 +1569,25 @@ if (true) {
 }
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 module.exports = require("source-map-support");
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = require("http");
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = require("body-parser");
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1446,7 +1651,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1460,23 +1665,23 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _server = __webpack_require__(20);
+var _server = __webpack_require__(21);
 
 var _reactRouter = __webpack_require__(3);
 
-var _express = __webpack_require__(8);
+var _express = __webpack_require__(9);
 
 var _express2 = _interopRequireDefault(_express);
 
-var _template = __webpack_require__(21);
+var _template = __webpack_require__(22);
 
 var _template2 = _interopRequireDefault(_template);
 
-var _Routes = __webpack_require__(22);
+var _Routes = __webpack_require__(23);
 
 var _Routes2 = _interopRequireDefault(_Routes);
 
-var _ContextWrapper = __webpack_require__(32);
+var _ContextWrapper = __webpack_require__(35);
 
 var _ContextWrapper2 = _interopRequireDefault(_ContextWrapper);
 
@@ -1500,7 +1705,7 @@ renderedPageRouter.get('*', (req, res) => {
       const dataFetchers = componentsWithData.map(c => c.dataFetcher({
         params: renderProps.params,
         location: renderProps.location,
-        urlBase: 'http://localhost:3000'
+        urlBase: 'http://localhost:3000', cookie: req.headers.cookie
       }));
       Promise.all(dataFetchers).then(dataList => {
         let initialState = {};
@@ -1528,13 +1733,13 @@ renderedPageRouter.get('*', (req, res) => {
 exports.default = renderedPageRouter;
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
 module.exports = require("react-dom/server.js");
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1575,7 +1780,7 @@ function template(body, initialState) {
 }
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1591,19 +1796,19 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactRouter = __webpack_require__(3);
 
-var _App = __webpack_require__(23);
+var _App = __webpack_require__(24);
 
 var _App2 = _interopRequireDefault(_App);
 
-var _IssueList = __webpack_require__(26);
+var _IssueList = __webpack_require__(29);
 
 var _IssueList2 = _interopRequireDefault(_IssueList);
 
-var _IssueEdit = __webpack_require__(28);
+var _IssueEdit = __webpack_require__(31);
 
 var _IssueEdit2 = _interopRequireDefault(_IssueEdit);
 
-var _IssueReport = __webpack_require__(31);
+var _IssueReport = __webpack_require__(34);
 
 var _IssueReport2 = _interopRequireDefault(_IssueReport);
 
@@ -1625,7 +1830,7 @@ exports.default = _react2.default.createElement(
 );
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1635,17 +1840,17 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-__webpack_require__(6);
+__webpack_require__(7);
 
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactBootstrap = __webpack_require__(2);
+var _reactBootstrap = __webpack_require__(1);
 
-var _reactRouterBootstrap = __webpack_require__(9);
+var _reactRouterBootstrap = __webpack_require__(6);
 
-var _IssueAddNavItem = __webpack_require__(24);
+var _IssueAddNavItem = __webpack_require__(10);
 
 var _IssueAddNavItem2 = _interopRequireDefault(_IssueAddNavItem);
 
@@ -1653,7 +1858,7 @@ var _withToast = __webpack_require__(4);
 
 var _withToast2 = _interopRequireDefault(_withToast);
 
-var _Header = __webpack_require__(38);
+var _Header = __webpack_require__(26);
 
 var _Header2 = _interopRequireDefault(_Header);
 
@@ -1661,13 +1866,32 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 //const HeaderWithToast = withToast(Header);
 class App extends _react2.default.Component {
-  constructor(props) {
-    super(props);
+  static dataFetcher(_ref) {
+    let urlBase = _ref.urlBase,
+        cookie = _ref.cookie;
+
+    const headers = cookie ? { headers: { Cookie: cookie } } : null;
+    return fetch(`${urlBase || ''}/api/users/me`, headers).then(response => {
+      if (!response.ok) return response.json().then(error => Promise.reject(error));
+      return response.json().then(data => ({ App: data }));
+    });
+  }
+
+  constructor(props, context) {
+    super(props, context);
+    const user = context.initialState.App ? context.initialState.App : {};
     this.state = {
-      user: { signedIn: false, name: '' }
+      user: user
     };
     this.onSignin = this.onSignin.bind(this);
     this.onSignout = this.onSignout.bind(this);
+  }
+
+  componentDidMount() {
+    App.dataFetcher({}).then(data => {
+      const user = data.App;
+      this.setState({ user: user });
+    });
   }
 
   onSignin(name) {
@@ -1679,6 +1903,7 @@ class App extends _react2.default.Component {
   }
 
   render() {
+    const childrenWithUser = _react2.default.Children.map(this.props.children, child => _react2.default.cloneElement(child, { user: this.state.user }));
     return _react2.default.createElement(
       'div',
       null,
@@ -1687,7 +1912,7 @@ class App extends _react2.default.Component {
       _react2.default.createElement(
         'div',
         { className: 'container-fluid' },
-        this.props.children,
+        childrenWithUser,
         _react2.default.createElement('hr', null),
         _react2.default.createElement(
           'h5',
@@ -1717,154 +1942,9 @@ App.propTypes = {
   children: _react2.default.PropTypes.object.isRequired
 };
 
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = __webpack_require__(1);
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-var _reactRouter = __webpack_require__(3);
-
-var _reactBootstrap = __webpack_require__(2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class IssueAddNavItem extends _react2.default.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showing: false
-    };
-    this.showModal = this.showModal.bind(this);
-    this.hideModal = this.hideModal.bind(this);
-    this.submit = this.submit.bind(this);
-  }
-
-  showModal() {
-    this.setState({ showing: true });
-  }
-
-  hideModal() {
-    this.setState({ showing: false });
-  }
-
-  submit(e) {
-    e.preventDefault();
-    this.hideModal();
-    const form = document.forms.issueAdd;
-    const newIssue = {
-      owner: form.owner.value, title: form.title.value,
-      status: 'New', created: new Date()
-    };
-    fetch('/api/issues', { method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newIssue)
-    }).then(response => {
-      if (response.ok) {
-        response.json().then(updatedIssue => {
-          this.props.router.push(`/issues/${updatedIssue._id}`);
-        });
-      } else {
-        response.json().then(error => {
-          this.props.showError(`Failed to add issue: ${error.message}`);
-        });
-      }
-    }).catch(err => {
-      this.props.showError(`Error in sending data to server: ${err.message}`);
-    });
-  }
-
-  render() {
-    return _react2.default.createElement(
-      _reactBootstrap.NavItem,
-      { onClick: this.showModal },
-      ' ',
-      _react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'plus' }),
-      'Create Issue',
-      _react2.default.createElement(
-        _reactBootstrap.Modal,
-        { keyboard: true, show: this.state.showing, onHide: this.hideModal },
-        _react2.default.createElement(
-          _reactBootstrap.Modal.Header,
-          { closeButton: true },
-          _react2.default.createElement(
-            _reactBootstrap.Modal.Title,
-            null,
-            ' Create Issue '
-          )
-        ),
-        _react2.default.createElement(
-          _reactBootstrap.Modal.Body,
-          null,
-          _react2.default.createElement(
-            _reactBootstrap.Form,
-            { name: 'issueAdd' },
-            _react2.default.createElement(
-              _reactBootstrap.FormGroup,
-              null,
-              _react2.default.createElement(
-                _reactBootstrap.ControlLabel,
-                null,
-                'Title'
-              ),
-              _react2.default.createElement(_reactBootstrap.FormControl, { name: 'title', autoFocus: true })
-            ),
-            _react2.default.createElement(
-              _reactBootstrap.FormGroup,
-              null,
-              _react2.default.createElement(
-                _reactBootstrap.ControlLabel,
-                null,
-                'Owner'
-              ),
-              _react2.default.createElement(_reactBootstrap.FormControl, { name: 'owner' })
-            )
-          )
-        ),
-        _react2.default.createElement(
-          _reactBootstrap.Modal.Footer,
-          null,
-          _react2.default.createElement(
-            _reactBootstrap.ButtonToolbar,
-            null,
-            _react2.default.createElement(
-              _reactBootstrap.Button,
-              { type: 'button', bsStyle: 'primary',
-                onClick: this.submit },
-              'Submit'
-            ),
-            _react2.default.createElement(
-              _reactBootstrap.Button,
-              { bsStyle: 'link', onClick: this.hideModal },
-              'Cancel'
-            )
-          )
-        )
-      )
-    );
-  }
-
-}
-
-IssueAddNavItem.propTypes = {
-  router: _propTypes2.default.object,
-  showError: _propTypes2.default.func.isRequired
+App.contextTypes = {
+  initialState: _react2.default.PropTypes.object
 };
-
-exports.default = (0, _reactRouter.withRouter)(IssueAddNavItem);
 
 /***/ }),
 /* 25 */
@@ -1881,11 +1961,11 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _propTypes = __webpack_require__(1);
+var _propTypes = __webpack_require__(2);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _reactBootstrap = __webpack_require__(2);
+var _reactBootstrap = __webpack_require__(1);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1946,17 +2026,343 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-__webpack_require__(27);
+var _reactBootstrap = __webpack_require__(1);
 
-var _propTypes = __webpack_require__(1);
+var _reactRouterBootstrap = __webpack_require__(6);
+
+var _reactRouter = __webpack_require__(3);
+
+var _reactSelect = __webpack_require__(27);
+
+var _reactSelect2 = _interopRequireDefault(_reactSelect);
+
+var _IssueAddNavItem = __webpack_require__(10);
+
+var _IssueAddNavItem2 = _interopRequireDefault(_IssueAddNavItem);
+
+var _withToast = __webpack_require__(4);
+
+var _withToast2 = _interopRequireDefault(_withToast);
+
+var _SigninNavItem = __webpack_require__(28);
+
+var _SigninNavItem2 = _interopRequireDefault(_SigninNavItem);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const Header = props => {
+  function searchIssues(input) {
+    if (input.length < 2) return Promise.resolve({ options: [] });
+
+    return fetch(`/api/issues?search=${input}`).then(response => {
+      if (!response.ok) return response.json().then(error => Promise.reject(error));
+      return response.json().then(data => {
+        const options = data.records.map(issue => ({
+          value: issue._id,
+          label: `${issue._id.substr(-4)}: ${issue.title}`
+        }));
+        return { options: options };
+      }).catch(error => {
+        this.props.showError(`Error fetching data from server: ${error}`);
+      });
+    });
+  }
+
+  function filterOptions(options) {
+    return options;
+  }
+
+  function selectIssue(item) {
+    if (item) props.router.push(`/issues/${item.value}`);
+  }
+
+  return _react2.default.createElement(
+    _reactBootstrap.Navbar,
+    { fluid: true },
+    _react2.default.createElement(
+      _reactBootstrap.Col,
+      { sm: 5 },
+      _react2.default.createElement(
+        _reactBootstrap.Navbar.Header,
+        null,
+        _react2.default.createElement(
+          _reactBootstrap.Navbar.Brand,
+          null,
+          'Issue Tracker'
+        )
+      ),
+      _react2.default.createElement(
+        _reactBootstrap.Nav,
+        null,
+        _react2.default.createElement(
+          _reactRouterBootstrap.LinkContainer,
+          { to: '/issues' },
+          _react2.default.createElement(
+            _reactBootstrap.NavItem,
+            null,
+            'Issues'
+          )
+        ),
+        _react2.default.createElement(
+          _reactRouterBootstrap.LinkContainer,
+          { to: '/reports' },
+          _react2.default.createElement(
+            _reactBootstrap.NavItem,
+            null,
+            'Reports'
+          )
+        )
+      )
+    ),
+    _react2.default.createElement(
+      _reactBootstrap.Col,
+      { sm: 4 },
+      _react2.default.createElement(
+        'div',
+        { style: { paddingTop: 8 } },
+        _react2.default.createElement(_reactSelect2.default.Async, {
+          instanceId: 'search', placeholder: 'Search ...', autoload: false, cache: false,
+          loadOptions: searchIssues, filterOptions: filterOptions, onChange: selectIssue
+        })
+      )
+    ),
+    _react2.default.createElement(
+      _reactBootstrap.Col,
+      { sm: 3 },
+      _react2.default.createElement(
+        _reactBootstrap.Nav,
+        { pullRight: true },
+        props.user.signedIn ? _react2.default.createElement(_IssueAddNavItem2.default, { showError: props.showError }) : null,
+        _react2.default.createElement(_SigninNavItem2.default, { user: props.user, onSignin: props.onSignin,
+          onSignout: props.onSignout,
+          showError: props.showError, showSuccess: props.showSuccess })
+      )
+    )
+  );
+};
+
+Header.propTypes = {
+  showError: _react2.default.PropTypes.func.isRequired,
+  router: _react2.default.PropTypes.object,
+  showSuccess: _react2.default.PropTypes.func.isRequired,
+  onSignin: _react2.default.PropTypes.func.isRequired,
+  onSignout: _react2.default.PropTypes.func.isRequired,
+  user: _react2.default.PropTypes.object
+};
+
+exports.default = (0, _reactRouter.withRouter)((0, _withToast2.default)(Header));
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports) {
+
+module.exports = require("react-select");
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactBootstrap = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class SigninNavItem extends _react2.default.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showing: false, disabled: true
+    };
+    this.showModal = this.showModal.bind(this);
+    this.hideModal = this.hideModal.bind(this);
+    this.signout = this.signout.bind(this);
+    this.signin = this.signin.bind(this);
+  }
+
+  componentDidMount() {
+    window.gapi.load('auth2', () => {
+      if (!window.gapi.auth2.getAuthInstance()) {
+        if (!window.config || !window.config.googleClientId) {
+          this.props.showError('Missing Google Client Id or  config file /static/config.js');
+        } else {
+          window.gapi.auth2.init({ client_id: window.config.googleClientId }).then(() => {
+            this.setState({ disabled: false });
+          });
+        }
+      }
+    });
+  }
+
+  /*signin(){
+    this.hideModal();
+    const auth2 = window.gapi.auth2.getAuthInstance();
+    auth2.signIn().then(googleUser => {
+      const name  = googleUser.getBasicProfile().getGivenName();
+      console.log("signed in success - name : ", name);
+      this.props.onSignin(name);
+    }, error =>{
+      this.props.showError(`Error authentication with Google ${error}`);
+    });
+  }*/
+
+  signin() {
+    this.hideModal();
+    const auth2 = window.gapi.auth2.getAuthInstance();
+    auth2.signIn().then(googleUser => {
+      fetch('/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_token: googleUser.getAuthResponse().id_token })
+      }).then(response => {
+        if (response.ok) {
+          response.json().then(user => {
+            this.props.onSignin(user.name);
+          });
+        } else {
+          response.json().then(error => {
+            this.props.showError(`App login failed : ${error}`);
+          });
+        }
+      }).catch(err => {
+        this.props.showError(`Error posting login to app: ${err}`);
+      });
+    }, error => {
+      this.props.showError(`Error authentication with Google ${error}`);
+    });
+  }
+
+  /*signout(){
+    const auth2 = window.gapi.auth2.getAuthInstance();
+    auth2.signOut().then(response => {
+      this.props.showSuccess('Successfully signed out.');
+      this.props.onSignout();
+    });
+  }*/
+
+  signout() {
+    const auth2 = window.gapi.auth2.getAuthInstance();
+    fetch('/signout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    }).then(response => {
+      if (response.ok) {
+        auth2.signOut().then(() => {
+          this.props.showSuccess('Successfully signed out');
+          this.props.onSignout();
+        });
+      }
+    });
+  }
+
+  showModal() {
+    if (this.state.disabled) {
+      this.props.showError('Missing Google Client Id or config file /static/config.js ');
+    } else {
+      this.setState({ showing: true });
+    }
+  }
+
+  hideModal() {
+    this.setState({ showing: false });
+  }
+
+  render() {
+    if (this.props.user.signedIn) {
+      return _react2.default.createElement(
+        _reactBootstrap.NavDropdown,
+        { title: this.props.user.name, id: 'user-dropdown' },
+        _react2.default.createElement(
+          _reactBootstrap.MenuItem,
+          { onClick: this.signout },
+          'Sign out'
+        )
+      );
+    }
+    return _react2.default.createElement(
+      _reactBootstrap.NavItem,
+      { onClick: this.showModal },
+      ' Sign In',
+      _react2.default.createElement(
+        _reactBootstrap.Modal,
+        { keyboard: true, show: this.state.showing, onHide: this.hideModal,
+          bsSize: 'sm' },
+        _react2.default.createElement(
+          _reactBootstrap.Modal.Header,
+          { closeButton: true },
+          _react2.default.createElement(
+            _reactBootstrap.Modal.Title,
+            null,
+            'Sign In'
+          )
+        ),
+        _react2.default.createElement(
+          _reactBootstrap.Modal.Body,
+          null,
+          _react2.default.createElement(
+            _reactBootstrap.Button,
+            { block: true, disabled: this.state.disabled, onClick: this.signin },
+            _react2.default.createElement('img', { src: '/btn_google_signin_dark_normal_web.png', alt: 'Signin' })
+          )
+        ),
+        _react2.default.createElement(
+          _reactBootstrap.Modal.Footer,
+          null,
+          _react2.default.createElement(
+            _reactBootstrap.Button,
+            { bsStyle: 'link', onClick: this.hideModal },
+            'Cancel '
+          )
+        )
+      )
+    );
+  }
+}
+
+exports.default = SigninNavItem;
+SigninNavItem.propTypes = {
+  user: _react2.default.PropTypes.object,
+  onSignin: _react2.default.PropTypes.func.isRequired,
+  onSignout: _react2.default.PropTypes.func.isRequired,
+  showError: _react2.default.PropTypes.func.isRequired,
+  showSuccess: _react2.default.PropTypes.func.isRequired
+};
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+__webpack_require__(30);
+
+var _propTypes = __webpack_require__(2);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
 var _reactRouter = __webpack_require__(3);
 
-var _reactBootstrap = __webpack_require__(2);
+var _reactBootstrap = __webpack_require__(1);
 
-var _IssueFilter = __webpack_require__(10);
+var _IssueFilter = __webpack_require__(11);
 
 var _IssueFilter2 = _interopRequireDefault(_IssueFilter);
 
@@ -1972,9 +2378,11 @@ const PAGE_SIZE = 10;
 
 
 const IssueRow = props => {
+
   function onDeleteClick() {
     props.deleteIssue(props.issue._id);
   }
+
   return _react2.default.createElement(
     'tr',
     null,
@@ -2017,7 +2425,7 @@ const IssueRow = props => {
       null,
       props.issue.title
     ),
-    _react2.default.createElement(
+    props.deleteIssue ? _react2.default.createElement(
       'td',
       null,
       _react2.default.createElement(
@@ -2026,13 +2434,13 @@ const IssueRow = props => {
         _react2.default.createElement(_reactBootstrap.Glyphicon, { glyph: 'trash' }),
         ' '
       )
-    )
+    ) : null
   );
 };
 
 IssueRow.propTypes = {
   issue: _propTypes2.default.object.isRequired,
-  deleteIssue: _propTypes2.default.func.isRequired
+  deleteIssue: _propTypes2.default.func
 };
 
 function IssueTable(props) {
@@ -2082,7 +2490,7 @@ function IssueTable(props) {
           null,
           'Title'
         ),
-        _react2.default.createElement('th', null)
+        props.deleteIssue ? _react2.default.createElement('th', null) : null
       )
     ),
     _react2.default.createElement(
@@ -2095,7 +2503,7 @@ function IssueTable(props) {
 
 IssueTable.propTypes = {
   issues: _propTypes2.default.array.isRequired,
-  deleteIssue: _propTypes2.default.func.isRequired
+  deleteIssue: _propTypes2.default.func
 };
 
 class IssueList extends _react2.default.Component {
@@ -2142,6 +2550,7 @@ class IssueList extends _react2.default.Component {
   }
 
   deleteIssue(id) {
+    const headers = props.user;
     fetch(`/api/issues/${id}`, { method: 'DELETE' }).then(response => {
       if (!response.ok) this.props.showError('Failed to delete issue');else this.loadData();
     });
@@ -2252,7 +2661,8 @@ class IssueList extends _react2.default.Component {
         items: Math.ceil(this.state.totalCount / PAGE_SIZE),
         activePage: parseInt(this.props.location.query._page || '1', 10),
         onSelect: this.selectPage, maxButtons: 7, next: true, prev: true, boundaryLinks: true }),
-      _react2.default.createElement(IssueTable, { issues: this.state.issues, deleteIssue: this.deleteIssue })
+      _react2.default.createElement(IssueTable, { issues: this.state.issues,
+        deleteIssue: this.props.user.signedIn ? this.deleteIssue : null })
     );
   }
 }
@@ -2264,7 +2674,8 @@ IssueList.contextTypes = {
 IssueList.propTypes = {
   location: _propTypes2.default.object.isRequired,
   router: _propTypes2.default.object,
-  showError: _propTypes2.default.func.isRequired
+  showError: _propTypes2.default.func.isRequired,
+  user: _propTypes2.default.object.isRequired
 };
 
 const IssueListWithToast = (0, _withToast2.default)(IssueList);
@@ -2273,13 +2684,13 @@ IssueListWithToast.dataFetcher = IssueList.dataFetcher;
 exports.default = IssueListWithToast;
 
 /***/ }),
-/* 27 */
+/* 30 */
 /***/ (function(module, exports) {
 
 module.exports = require("isomorphic-fetch");
 
 /***/ }),
-/* 28 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2293,21 +2704,21 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _propTypes = __webpack_require__(1);
+var _propTypes = __webpack_require__(2);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
 var _reactRouter = __webpack_require__(3);
 
-var _reactRouterBootstrap = __webpack_require__(9);
+var _reactRouterBootstrap = __webpack_require__(6);
 
-var _reactBootstrap = __webpack_require__(2);
+var _reactBootstrap = __webpack_require__(1);
 
-var _NumInput = __webpack_require__(29);
+var _NumInput = __webpack_require__(32);
 
 var _NumInput2 = _interopRequireDefault(_NumInput);
 
-var _DateInput = __webpack_require__(30);
+var _DateInput = __webpack_require__(33);
 
 var _DateInput2 = _interopRequireDefault(_DateInput);
 
@@ -2619,7 +3030,7 @@ class IssueEdit extends _react2.default.Component {
               null,
               _react2.default.createElement(
                 _reactBootstrap.Button,
-                { bsStyle: 'primary', type: 'submit' },
+                { bsStyle: 'primary', type: 'submit', disabled: !this.props.user.signedIn },
                 'Submit'
               ),
               _react2.default.createElement(
@@ -2657,7 +3068,8 @@ IssueEdit.contextTypes = {
 IssueEdit.propTypes = {
   params: _propTypes2.default.object.isRequired,
   showSuccess: _propTypes2.default.func.isRequired,
-  showError: _propTypes2.default.func.isRequired
+  showError: _propTypes2.default.func.isRequired,
+  user: _react2.default.PropTypes.object.isRequired
 };
 
 const IssueEditWithToast = (0, _withToast2.default)(IssueEdit);
@@ -2666,7 +3078,7 @@ IssueEditWithToast.dataFetcher = IssueEdit.dataFetcher;
 exports.default = IssueEditWithToast;
 
 /***/ }),
-/* 29 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2682,7 +3094,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _propTypes = __webpack_require__(1);
+var _propTypes = __webpack_require__(2);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
@@ -2731,7 +3143,7 @@ NumInput.propTypes = {
 };
 
 /***/ }),
-/* 30 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2747,7 +3159,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _propTypes = __webpack_require__(1);
+var _propTypes = __webpack_require__(2);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
@@ -2827,7 +3239,7 @@ DateInput.propTypes = {
 };
 
 /***/ }),
-/* 31 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2841,9 +3253,9 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactBootstrap = __webpack_require__(2);
+var _reactBootstrap = __webpack_require__(1);
 
-var _IssueFilter = __webpack_require__(10);
+var _IssueFilter = __webpack_require__(11);
 
 var _IssueFilter2 = _interopRequireDefault(_IssueFilter);
 
@@ -2974,7 +3386,7 @@ IssueReportWithToast.dataFetcher = IssueReport.dataFetcher;
 exports.default = IssueReportWithToast;
 
 /***/ }),
-/* 32 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2988,7 +3400,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _propTypes = __webpack_require__(1);
+var _propTypes = __webpack_require__(2);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
@@ -3015,25 +3427,25 @@ ContextWrapper.propTypes = {
 };
 
 /***/ }),
-/* 33 */
+/* 36 */
 /***/ (function(module, exports) {
 
 module.exports = require("webpack-dev-middleware");
 
 /***/ }),
-/* 34 */
+/* 37 */
 /***/ (function(module, exports) {
 
 module.exports = require("webpack-hot-middleware");
 
 /***/ }),
-/* 35 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(__dirname) {
 
-const webpack = __webpack_require__(11);
+const webpack = __webpack_require__(12);
 
 module.exports = {
   entry: {
@@ -3070,7 +3482,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, "/"))
 
 /***/ }),
-/* 36 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(__resourceQuery) {/*
@@ -3080,7 +3492,7 @@ module.exports = {
 /*globals __resourceQuery */
 if(true) {
 	var hotPollInterval = +(__resourceQuery.substr(1)) || (10 * 60 * 1000);
-	var log = __webpack_require__(12);
+	var log = __webpack_require__(13);
 
 	var checkForUpdate = function checkForUpdate(fromUpdate) {
 		if(module.hot.status() === "idle") {
@@ -3089,7 +3501,7 @@ if(true) {
 					if(fromUpdate) log("info", "[HMR] Update applied.");
 					return;
 				}
-				__webpack_require__(37)(updatedModules, updatedModules);
+				__webpack_require__(40)(updatedModules, updatedModules);
 				checkForUpdate(true);
 			}).catch(function(err) {
 				var status = module.hot.status();
@@ -3111,7 +3523,7 @@ if(true) {
 /* WEBPACK VAR INJECTION */}.call(exports, "?1000"))
 
 /***/ }),
-/* 37 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -3122,7 +3534,7 @@ module.exports = function(updatedModules, renewedModules) {
 	var unacceptedModules = updatedModules.filter(function(moduleId) {
 		return renewedModules && renewedModules.indexOf(moduleId) < 0;
 	});
-	var log = __webpack_require__(12);
+	var log = __webpack_require__(13);
 
 	if(unacceptedModules.length > 0) {
 		log("warning", "[HMR] The following modules couldn't be hot updated: (They would need a full reload!)");
@@ -3155,289 +3567,10 @@ module.exports = function(updatedModules, renewedModules) {
 
 
 /***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactBootstrap = __webpack_require__(2);
-
-var _reactRouterBootstrap = __webpack_require__(9);
-
-var _reactRouter = __webpack_require__(3);
-
-var _reactSelect = __webpack_require__(39);
-
-var _reactSelect2 = _interopRequireDefault(_reactSelect);
-
-var _IssueAddNavItem = __webpack_require__(24);
-
-var _IssueAddNavItem2 = _interopRequireDefault(_IssueAddNavItem);
-
-var _withToast = __webpack_require__(4);
-
-var _withToast2 = _interopRequireDefault(_withToast);
-
-var _SigninNavItem = __webpack_require__(40);
-
-var _SigninNavItem2 = _interopRequireDefault(_SigninNavItem);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const Header = props => {
-  function searchIssues(input) {
-    if (input.length < 2) return Promise.resolve({ options: [] });
-
-    return fetch(`/api/issues?search=${input}`).then(response => {
-      if (!response.ok) return response.json().then(error => Promise.reject(error));
-      return response.json().then(data => {
-        const options = data.records.map(issue => ({
-          value: issue._id,
-          label: `${issue._id.substr(-4)}: ${issue.title}`
-        }));
-        return { options: options };
-      }).catch(error => {
-        this.props.showError(`Error fetching data from server: ${error}`);
-      });
-    });
-  }
-
-  function filterOptions(options) {
-    return options;
-  }
-
-  function selectIssue(item) {
-    if (item) props.router.push(`/issues/${item.value}`);
-  }
-
-  return _react2.default.createElement(
-    _reactBootstrap.Navbar,
-    { fluid: true },
-    _react2.default.createElement(
-      _reactBootstrap.Col,
-      { sm: 5 },
-      _react2.default.createElement(
-        _reactBootstrap.Navbar.Header,
-        null,
-        _react2.default.createElement(
-          _reactBootstrap.Navbar.Brand,
-          null,
-          'Issue Tracker'
-        )
-      ),
-      _react2.default.createElement(
-        _reactBootstrap.Nav,
-        null,
-        _react2.default.createElement(
-          _reactRouterBootstrap.LinkContainer,
-          { to: '/issues' },
-          _react2.default.createElement(
-            _reactBootstrap.NavItem,
-            null,
-            'Issues'
-          )
-        ),
-        _react2.default.createElement(
-          _reactRouterBootstrap.LinkContainer,
-          { to: '/reports' },
-          _react2.default.createElement(
-            _reactBootstrap.NavItem,
-            null,
-            'Reports'
-          )
-        )
-      )
-    ),
-    _react2.default.createElement(
-      _reactBootstrap.Col,
-      { sm: 4 },
-      _react2.default.createElement(
-        'div',
-        { style: { paddingTop: 8 } },
-        _react2.default.createElement(_reactSelect2.default.Async, {
-          instanceId: 'search', placeholder: 'Search ...', autoload: false, cache: false,
-          loadOptions: searchIssues, filterOptions: filterOptions, onChange: selectIssue
-        })
-      )
-    ),
-    _react2.default.createElement(
-      _reactBootstrap.Col,
-      { sm: 3 },
-      _react2.default.createElement(
-        _reactBootstrap.Nav,
-        { pullRight: true },
-        _react2.default.createElement(_IssueAddNavItem2.default, { showError: props.showError }),
-        _react2.default.createElement(_SigninNavItem2.default, { user: props.user, onSignin: props.onSignin,
-          onSignout: props.onSignout,
-          showError: props.showError, showSuccess: props.showSuccess })
-      )
-    )
-  );
-};
-
-Header.propTypes = {
-  showError: _react2.default.PropTypes.func.isRequired,
-  router: _react2.default.PropTypes.object,
-  showSuccess: _react2.default.PropTypes.func.isRequired,
-  onSignin: _react2.default.PropTypes.func.isRequired,
-  onSignout: _react2.default.PropTypes.func.isRequired,
-  user: _react2.default.PropTypes.object
-};
-
-exports.default = (0, _reactRouter.withRouter)((0, _withToast2.default)(Header));
-
-/***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, exports) {
 
-module.exports = require("react-select");
-
-/***/ }),
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactBootstrap = __webpack_require__(2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-class SigninNavItem extends _react2.default.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showing: false, disabled: true
-    };
-    this.showModal = this.showModal.bind(this);
-    this.hideModal = this.hideModal.bind(this);
-    this.signout = this.signout.bind(this);
-    this.signin = this.signin.bind(this);
-  }
-
-  componentDidMount() {
-    window.gapi.load('auth2', () => {
-      if (!window.gapi.auth2.getAuthInstance()) {
-        if (!window.config || !window.config.googleClientId) {
-          this.props.showError('Missing Google Client Id or  config file /static/config.js');
-        } else {
-          window.gapi.auth2.init({ client_id: window.config.googleClientId }).then(() => {
-            this.setState({ disabled: false });
-          });
-        }
-      }
-    });
-  }
-
-  signin() {
-    this.hideModal();
-    const auth2 = window.gapi.auth2.getAuthInstance();
-    auth2.signIn().then(googleUser => {
-      const name = googleUser.getBasicProfile().getGivenName();
-      console.log("signed in success - name : ", name);
-      this.props.onSignin(name);
-    }, error => {
-      this.props.showError(`Error authentication with Google ${error}`);
-    });
-  }
-
-  signout() {
-    const auth2 = window.gapi.auth2.getAuthInstance();
-    auth2.signOut().then(response => {
-      this.props.showSuccess('Successfully signed out.');
-      this.props.onSignout();
-    });
-  }
-
-  showModal() {
-    if (this.state.disabled) {
-      this.props.showError('Missing Google Client Id or config file /static/config.js ');
-    } else {
-      this.setState({ showing: true });
-    }
-  }
-
-  hideModal() {
-    this.setState({ showing: false });
-  }
-
-  render() {
-    if (this.props.user.signedIn) {
-      return _react2.default.createElement(
-        _reactBootstrap.NavDropdown,
-        { title: this.props.user.name, id: 'user-dropdown' },
-        _react2.default.createElement(
-          _reactBootstrap.MenuItem,
-          { onClick: this.signout },
-          'Sign out'
-        )
-      );
-    }
-    return _react2.default.createElement(
-      _reactBootstrap.NavItem,
-      { onClick: this.showModal },
-      ' Sign In',
-      _react2.default.createElement(
-        _reactBootstrap.Modal,
-        { keyboard: true, show: this.state.showing, onHide: this.hideModal,
-          bsSize: 'sm' },
-        _react2.default.createElement(
-          _reactBootstrap.Modal.Header,
-          { closeButton: true },
-          _react2.default.createElement(
-            _reactBootstrap.Modal.Title,
-            null,
-            'Sign In'
-          )
-        ),
-        _react2.default.createElement(
-          _reactBootstrap.Modal.Body,
-          null,
-          _react2.default.createElement(
-            _reactBootstrap.Button,
-            { block: true, disabled: this.state.disabled, onClick: this.signin },
-            _react2.default.createElement('img', { src: '/btn_google_signin_dark_normal_web.png', alt: 'Signin' })
-          )
-        ),
-        _react2.default.createElement(
-          _reactBootstrap.Modal.Footer,
-          null,
-          _react2.default.createElement(
-            _reactBootstrap.Button,
-            { bsStyle: 'link', onClick: this.hideModal },
-            'Cancel '
-          )
-        )
-      )
-    );
-  }
-}
-
-exports.default = SigninNavItem;
-SigninNavItem.propTypes = {
-  user: _react2.default.PropTypes.object,
-  onSignin: _react2.default.PropTypes.func.isRequired,
-  onSignout: _react2.default.PropTypes.func.isRequired,
-  showError: _react2.default.PropTypes.func.isRequired,
-  showSuccess: _react2.default.PropTypes.func.isRequired
-};
+module.exports = require("express-session");
 
 /***/ })
 /******/ ])));

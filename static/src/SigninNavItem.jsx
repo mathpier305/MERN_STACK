@@ -27,7 +27,7 @@ export default class SigninNavItem extends React.Component{
     });
   }
 
-  signin(){
+  /*signin(){
     this.hideModal();
     const auth2 = window.gapi.auth2.getAuthInstance();
     auth2.signIn().then(googleUser => {
@@ -37,13 +37,55 @@ export default class SigninNavItem extends React.Component{
     }, error =>{
       this.props.showError(`Error authentication with Google ${error}`);
     });
+  }*/
+
+  signin(){
+    this.hideModal();
+    const auth2 = window.gapi.auth2.getAuthInstance();
+    auth2.signIn().then(googleUser => {
+      fetch('/signin', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id_token: googleUser.getAuthResponse().id_token }),
+      }).then(response => {
+        if(response.ok){
+        response.json().then(user =>{
+          this.props.onSignin(user.name);
+        });
+      }else {
+        response.json().then(error => {
+          this.props.showError(`App login failed : ${error}`);
+        });
+      }
+    }).catch(err => {
+      this.props.showError(`Error posting login to app: ${err}`);
+    });
+  },error => {
+    this.props.showError(`Error authentication with Google ${error}`);
+  });
+
   }
 
-  signout(){
+  /*signout(){
     const auth2 = window.gapi.auth2.getAuthInstance();
     auth2.signOut().then(response => {
       this.props.showSuccess('Successfully signed out.');
       this.props.onSignout();
+    });
+  }*/
+
+  signout(){
+    const auth2 = window.gapi.auth2.getAuthInstance();
+    fetch('/signout', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+    }).then(response => {
+      if(response.ok){
+        auth2.signOut().then( ()=>{
+          this.props.showSuccess('Successfully signed out');
+          this.props.onSignout();
+        });
+      }
     });
   }
 

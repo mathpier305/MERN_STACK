@@ -5,6 +5,7 @@
 //import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
+import session from 'express-session';
 import {ObjectId } from 'mongodb';
 import Issue from './issue.js';
 import renderedPageRouter from './renderedPageRouter';
@@ -12,7 +13,61 @@ import renderedPageRouter from './renderedPageRouter';
 const app = express();
 app.use(express.static('static'));
 app.use(bodyParser.json());
+app.use(session({secret:'h7e3f5s6', resave:false,
+  saveUninitialized: true}));
 
+app.all('/api/*', (req, res, next) =>{
+  if(req.method === 'DELETE' || req.method === 'POST' ||
+    req.method === 'PUT'){
+      if(!req.session || !req.session.user){
+        console.log("the session is : ", req.session);
+        res.status(403).send({
+          message: 'You are not authorized to perform the operation'
+        });
+      }else{
+        next();
+      }
+    }else{
+      next();
+    }
+});
+
+
+app.get('/api/users/me', (req,res) =>{
+  if(req.session && req.session.user){
+    res.json(req.session.user);
+  }else{
+    res.json({signedIn: false, name: ''});
+  }
+});
+
+app.post('/signin', (req, res) =>{
+  if(!req.body.id_token) {
+    res.status(400).send({code : 400, message : 'Missing token. '});
+    return;
+  }
+  console.log("tried to sign in  -- session ", req.body.id_token);
+  fetch(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${req.body.id_token}`).
+  then(response=>{
+    if(!response.ok) response.json().then(error => Promise.reject(error));
+    response.json().then(data => {
+      req.session.user ={
+        signedIn: true, name: data.given_name,
+      };
+      console.log("signed in successfully  -- session ", req.session);
+      res.json(req.session.user);
+    });
+  }).catch(error => {
+    console.log(error);
+    res.status(500).json({message: `Internal Server error ${error}`});
+  });
+});
+
+
+app.post('/signout', (req, res) => {
+  if(req.session) req.session.destroy();
+  res.json({status:'ok'});
+});
 
 // app.use(bodyParser.urlencoded({extended: true}));
 // app.use(bodyParser.json({type: 'application/*+json'}));
@@ -40,6 +95,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 app.delete('/api/issues/:id', (req, res) =>{
+  console.log("server -- trying to delete issue  ");
   let issueId;
   try{
     issueId = new ObjectId(req.params.id);

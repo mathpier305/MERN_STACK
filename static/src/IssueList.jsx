@@ -12,9 +12,11 @@ import withToast from './withToast.jsx';
 const PAGE_SIZE = 10;
 
 const IssueRow = (props) => {
+
   function onDeleteClick(){
     props.deleteIssue(props.issue._id);
   }
+
   return (
   <tr>
     <td><Link to={`/issues/${props.issue._id}`}>{props.issue._id.substr(-4)}</Link></td>
@@ -24,9 +26,10 @@ const IssueRow = (props) => {
     <td>{props.issue.effort}</td>
     <td>{props.issue.completionDate ? props.issue.completionDate.toDateString() : ''}</td>
     <td>{props.issue.title}</td>
+    {props.deleteIssue ? (
     <td><Button bsSize="xsmall" onClick={onDeleteClick}>
       <Glyphicon glyph="trash" /> </Button>
-    </td>
+    </td> ): null }
   </tr>
 );
 };
@@ -34,7 +37,7 @@ const IssueRow = (props) => {
 
 IssueRow.propTypes = {
   issue: PropTypes.object.isRequired,
-  deleteIssue: PropTypes.func.isRequired,
+  deleteIssue: PropTypes.func,
 };
 
 function IssueTable (props){
@@ -52,7 +55,7 @@ function IssueTable (props){
        <th>Effort</th>
        <th>Completion Date</th>
        <th>Title</th>
-       <th></th>
+       {props.deleteIssue ? <th></th> : null }
       </tr>
     </thead>
     <tbody>{issueRows}</tbody>
@@ -63,7 +66,7 @@ function IssueTable (props){
 
 IssueTable.propTypes = {
   issues : PropTypes.array.isRequired,
-  deleteIssue : PropTypes.func.isRequired,
+  deleteIssue : PropTypes.func,
 };
 
 
@@ -113,6 +116,7 @@ class IssueList extends React.Component {
   }
 
   deleteIssue(id){
+    const headers = props.user;
     fetch(`/api/issues/${id}`,{method: 'DELETE'}).then(response =>{
       if(!response.ok) this.props.showError('Failed to delete issue');
       else this.loadData();
@@ -226,8 +230,8 @@ class IssueList extends React.Component {
           items={Math.ceil(this.state.totalCount / PAGE_SIZE)}
           activePage = {parseInt(this.props.location.query._page || '1', 10)}
           onSelect={this.selectPage} maxButtons={7} next prev boundaryLinks />
-        <IssueTable issues={this.state.issues} deleteIssue={this.deleteIssue}/>
-
+        <IssueTable issues={this.state.issues}
+          deleteIssue={this.props.user.signedIn ? this.deleteIssue : null} />
 
 
 
@@ -244,6 +248,7 @@ IssueList.propTypes = {
   location: PropTypes.object.isRequired,
   router: PropTypes.object,
   showError: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
 };
 
 const IssueListWithToast = withToast(IssueList);

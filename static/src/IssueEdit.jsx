@@ -215,7 +215,9 @@ loadData(){
           <FormGroup>
             <Col smOffset={3} sm={6}>
               <ButtonToolbar>
-                <Button bsStyle="primary" type="submit">Submit</Button>
+                <Button bsStyle="primary" type="submit" disabled={!this.props.user.signedIn} >
+                  Submit
+                </Button>
                 <LinkContainer to="/issues">
                   <Button bsStyle="link">Back </Button>
                 </LinkContainer>
@@ -270,6 +272,7 @@ IssueEdit.propTypes = {
   params: PropTypes.object.isRequired,
   showSuccess: PropTypes.func.isRequired,
   showError: PropTypes.func.isRequired,
+  user: React.PropTypes.object.isRequired,
 };
 
 const IssueEditWithToast = withToast(IssueEdit);
