@@ -82,7 +82,7 @@ class IssueList extends React.Component {
     }
     query._limit = PAGE_SIZE;
     const search = Object.keys(query).map(k=>`${k}=${query[k]}`).join('&');
-    return fetch(`${urlBase || ''}/api/issues?${search}`).then(response=>{
+    return fetch(`${urlBase || ''}/api/issues?${search}`,{credentials: 'same-origin'}).then(response=>{
             if(!response.ok) return response.json(). then(error=>
             Promise.reject(error));
             return response.json().then(data=>
@@ -117,7 +117,7 @@ class IssueList extends React.Component {
 
   deleteIssue(id){
     const headers = props.user;
-    fetch(`/api/issues/${id}`,{method: 'DELETE'}).then(response =>{
+    fetch(`/api/issues/${id}`,{method: 'DELETE',credentials: 'same-origin'}).then(response =>{
       if(!response.ok) this.props.showError('Failed to delete issue');
       else this.loadData();
     })

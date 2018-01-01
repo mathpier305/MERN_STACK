@@ -34,6 +34,7 @@ class IssueAddNavItem extends React.Component{
       status: 'New', created: new Date(),
     };
     fetch('/api/issues', {method: 'POST',
+                          credentials: 'same-origin',
                           headers: {'Content-Type': 'application/json'},
                           body: JSON.stringify(newIssue),
                         }).then(response=>{
