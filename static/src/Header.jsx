@@ -12,7 +12,7 @@ const Header = (props) => {
   function searchIssues(input) {
     if (input.length < 2) return Promise.resolve({ options: [] });
 
-    return fetch(`/api/issues?search=${input}`).then(response => {
+    return fetch(`/api/issues?search=${input}`,{credentials: 'same-origin'}).then(response => {
       if (!response.ok) return response.json().then(error => Promise.reject(error));
       return response.json().then(data => {
         const options = data.records.map(issue => ({

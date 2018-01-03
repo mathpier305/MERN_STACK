@@ -45,6 +45,7 @@ export default class SigninNavItem extends React.Component{
     auth2.signIn().then(googleUser => {
       fetch('/signin', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({id_token: googleUser.getAuthResponse().id_token }),
       }).then(response => {
@@ -78,6 +79,7 @@ export default class SigninNavItem extends React.Component{
     const auth2 = window.gapi.auth2.getAuthInstance();
     fetch('/signout', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: {'Content-Type': 'application/json'},
     }).then(response => {
       if(response.ok){

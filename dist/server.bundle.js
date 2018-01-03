@@ -20,7 +20,7 @@
 /******/ 	
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "2ff455e51cd4c4d74ad9"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "d3ac841bb5cf68d01c6c"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -727,7 +727,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _Toast = __webpack_require__(25);
+var _Toast = __webpack_require__(26);
 
 var _Toast2 = _interopRequireDefault(_Toast);
 
@@ -796,17 +796,17 @@ var _bodyParser = __webpack_require__(18);
 
 var _bodyParser2 = _interopRequireDefault(_bodyParser);
 
-var _expressSession = __webpack_require__(41);
+var _expressSession = __webpack_require__(19);
 
 var _expressSession2 = _interopRequireDefault(_expressSession);
 
 var _mongodb = __webpack_require__(8);
 
-var _issue = __webpack_require__(19);
+var _issue = __webpack_require__(20);
 
 var _issue2 = _interopRequireDefault(_issue);
 
-var _renderedPageRouter = __webpack_require__(20);
+var _renderedPageRouter = __webpack_require__(21);
 
 var _renderedPageRouter2 = _interopRequireDefault(_renderedPageRouter);
 
@@ -882,10 +882,10 @@ let db;
 
 if (process.env.NODE_ENV !== 'production') {
   const webpack = __webpack_require__(12);
-  const webpackDevMiddleware = __webpack_require__(36);
-  const webpackHotMiddleware = __webpack_require__(37);
+  const webpackDevMiddleware = __webpack_require__(37);
+  const webpackHotMiddleware = __webpack_require__(38);
 
-  const config = __webpack_require__(38);
+  const config = __webpack_require__(39);
   config.entry.app.push('webpack-hot-middleware/client', 'webpack/hot/only-dev-server');
   config.plugins.push(new webpack.HotModuleReplacementPlugin());
 
@@ -1131,6 +1131,7 @@ class IssueAddNavItem extends _react2.default.Component {
       status: 'New', created: new Date()
     };
     fetch('/api/issues', { method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newIssue)
     }).then(response => {
@@ -1516,7 +1517,7 @@ module.exports.setLogLevel = function(level) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(15);
-module.exports = __webpack_require__(39);
+module.exports = __webpack_require__(40);
 
 
 /***/ }),
@@ -1588,6 +1589,12 @@ module.exports = require("body-parser");
 
 /***/ }),
 /* 19 */
+/***/ (function(module, exports) {
+
+module.exports = require("express-session");
+
+/***/ }),
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1651,7 +1658,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1665,7 +1672,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _server = __webpack_require__(21);
+var _server = __webpack_require__(22);
 
 var _reactRouter = __webpack_require__(3);
 
@@ -1673,15 +1680,15 @@ var _express = __webpack_require__(9);
 
 var _express2 = _interopRequireDefault(_express);
 
-var _template = __webpack_require__(22);
+var _template = __webpack_require__(23);
 
 var _template2 = _interopRequireDefault(_template);
 
-var _Routes = __webpack_require__(23);
+var _Routes = __webpack_require__(24);
 
 var _Routes2 = _interopRequireDefault(_Routes);
 
-var _ContextWrapper = __webpack_require__(35);
+var _ContextWrapper = __webpack_require__(36);
 
 var _ContextWrapper2 = _interopRequireDefault(_ContextWrapper);
 
@@ -1733,13 +1740,13 @@ renderedPageRouter.get('*', (req, res) => {
 exports.default = renderedPageRouter;
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports) {
 
 module.exports = require("react-dom/server.js");
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1780,7 +1787,7 @@ function template(body, initialState) {
 }
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1796,19 +1803,19 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactRouter = __webpack_require__(3);
 
-var _App = __webpack_require__(24);
+var _App = __webpack_require__(25);
 
 var _App2 = _interopRequireDefault(_App);
 
-var _IssueList = __webpack_require__(29);
+var _IssueList = __webpack_require__(30);
 
 var _IssueList2 = _interopRequireDefault(_IssueList);
 
-var _IssueEdit = __webpack_require__(31);
+var _IssueEdit = __webpack_require__(32);
 
 var _IssueEdit2 = _interopRequireDefault(_IssueEdit);
 
-var _IssueReport = __webpack_require__(34);
+var _IssueReport = __webpack_require__(35);
 
 var _IssueReport2 = _interopRequireDefault(_IssueReport);
 
@@ -1830,7 +1837,7 @@ exports.default = _react2.default.createElement(
 );
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1858,7 +1865,7 @@ var _withToast = __webpack_require__(4);
 
 var _withToast2 = _interopRequireDefault(_withToast);
 
-var _Header = __webpack_require__(26);
+var _Header = __webpack_require__(27);
 
 var _Header2 = _interopRequireDefault(_Header);
 
@@ -1947,7 +1954,7 @@ App.contextTypes = {
 };
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2012,7 +2019,7 @@ Toast.defaultProps = {
 };
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2032,7 +2039,7 @@ var _reactRouterBootstrap = __webpack_require__(6);
 
 var _reactRouter = __webpack_require__(3);
 
-var _reactSelect = __webpack_require__(27);
+var _reactSelect = __webpack_require__(28);
 
 var _reactSelect2 = _interopRequireDefault(_reactSelect);
 
@@ -2044,7 +2051,7 @@ var _withToast = __webpack_require__(4);
 
 var _withToast2 = _interopRequireDefault(_withToast);
 
-var _SigninNavItem = __webpack_require__(28);
+var _SigninNavItem = __webpack_require__(29);
 
 var _SigninNavItem2 = _interopRequireDefault(_SigninNavItem);
 
@@ -2054,7 +2061,7 @@ const Header = props => {
   function searchIssues(input) {
     if (input.length < 2) return Promise.resolve({ options: [] });
 
-    return fetch(`/api/issues?search=${input}`).then(response => {
+    return fetch(`/api/issues?search=${input}`, { credentials: 'same-origin' }).then(response => {
       if (!response.ok) return response.json().then(error => Promise.reject(error));
       return response.json().then(data => {
         const options = data.records.map(issue => ({
@@ -2153,13 +2160,13 @@ Header.propTypes = {
 exports.default = (0, _reactRouter.withRouter)((0, _withToast2.default)(Header));
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports) {
 
 module.exports = require("react-select");
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2221,6 +2228,7 @@ class SigninNavItem extends _react2.default.Component {
     auth2.signIn().then(googleUser => {
       fetch('/signin', {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id_token: googleUser.getAuthResponse().id_token })
       }).then(response => {
@@ -2253,6 +2261,7 @@ class SigninNavItem extends _react2.default.Component {
     const auth2 = window.gapi.auth2.getAuthInstance();
     fetch('/signout', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' }
     }).then(response => {
       if (response.ok) {
@@ -2338,7 +2347,7 @@ SigninNavItem.propTypes = {
 };
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2352,7 +2361,7 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-__webpack_require__(30);
+__webpack_require__(31);
 
 var _propTypes = __webpack_require__(2);
 
@@ -2520,7 +2529,7 @@ class IssueList extends _react2.default.Component {
     }
     query._limit = PAGE_SIZE;
     const search = Object.keys(query).map(k => `${k}=${query[k]}`).join('&');
-    return fetch(`${urlBase || ''}/api/issues?${search}`).then(response => {
+    return fetch(`${urlBase || ''}/api/issues?${search}`, { credentials: 'same-origin' }).then(response => {
       if (!response.ok) return response.json().then(error => Promise.reject(error));
       return response.json().then(data => ({ IssueList: data }));
     });
@@ -2551,7 +2560,7 @@ class IssueList extends _react2.default.Component {
 
   deleteIssue(id) {
     const headers = props.user;
-    fetch(`/api/issues/${id}`, { method: 'DELETE' }).then(response => {
+    fetch(`/api/issues/${id}`, { method: 'DELETE', credentials: 'same-origin' }).then(response => {
       if (!response.ok) this.props.showError('Failed to delete issue');else this.loadData();
     });
   }
@@ -2684,13 +2693,13 @@ IssueListWithToast.dataFetcher = IssueList.dataFetcher;
 exports.default = IssueListWithToast;
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports) {
 
 module.exports = require("isomorphic-fetch");
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2714,11 +2723,11 @@ var _reactRouterBootstrap = __webpack_require__(6);
 
 var _reactBootstrap = __webpack_require__(1);
 
-var _NumInput = __webpack_require__(32);
+var _NumInput = __webpack_require__(33);
 
 var _NumInput2 = _interopRequireDefault(_NumInput);
 
-var _DateInput = __webpack_require__(33);
+var _DateInput = __webpack_require__(34);
 
 var _DateInput2 = _interopRequireDefault(_DateInput);
 
@@ -2734,7 +2743,7 @@ class IssueEdit extends _react2.default.Component {
     let params = _ref.params,
         urlBase = _ref.urlBase;
 
-    return fetch(`${urlBase || ''}/api/issues/${params.id}`).then(response => {
+    return fetch(`${urlBase || ''}/api/issues/${params.id}`, { credentials: 'same-origin' }).then(response => {
       if (!response.ok) return response.json().then(error => Promise.reject(error));
       return response.json().then(data => ({ IssueEdit: data }));
     });
@@ -2810,6 +2819,7 @@ class IssueEdit extends _react2.default.Component {
     }
     fetch(`/api/issues/${this.props.params.id}`, {
       method: 'PUT',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(this.state.issue)
     }).then(response => {
@@ -3078,7 +3088,7 @@ IssueEditWithToast.dataFetcher = IssueEdit.dataFetcher;
 exports.default = IssueEditWithToast;
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3143,7 +3153,7 @@ NumInput.propTypes = {
 };
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3239,7 +3249,7 @@ DateInput.propTypes = {
 };
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3293,7 +3303,7 @@ class IssueReport extends _react2.default.Component {
         location = _ref.location;
 
     const search = location.search ? `${location.search}&_summary` : '?_summary';
-    return fetch(`${urlBase || ''}/api/issues${search}`).then(response => {
+    return fetch(`${urlBase || ''}/api/issues${search}`, { credentials: 'same-origin' }).then(response => {
       if (!response.ok) return response.json().then(error => Promise.reject(error));
       return response.json().then(data => ({ IssueReport: data }));
     });
@@ -3386,7 +3396,7 @@ IssueReportWithToast.dataFetcher = IssueReport.dataFetcher;
 exports.default = IssueReportWithToast;
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3427,19 +3437,19 @@ ContextWrapper.propTypes = {
 };
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports) {
 
 module.exports = require("webpack-dev-middleware");
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports) {
 
 module.exports = require("webpack-hot-middleware");
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3482,7 +3492,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, "/"))
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(__resourceQuery) {/*
@@ -3501,7 +3511,7 @@ if(true) {
 					if(fromUpdate) log("info", "[HMR] Update applied.");
 					return;
 				}
-				__webpack_require__(40)(updatedModules, updatedModules);
+				__webpack_require__(41)(updatedModules, updatedModules);
 				checkForUpdate(true);
 			}).catch(function(err) {
 				var status = module.hot.status();
@@ -3523,7 +3533,7 @@ if(true) {
 /* WEBPACK VAR INJECTION */}.call(exports, "?1000"))
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -3565,12 +3575,6 @@ module.exports = function(updatedModules, renewedModules) {
 	}
 };
 
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports) {
-
-module.exports = require("express-session");
 
 /***/ })
 /******/ ])));

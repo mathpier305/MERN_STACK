@@ -21,7 +21,7 @@ StatRow.propTypes = {
 class IssueReport extends React.Component {
   static dataFetcher({ urlBase, location }) {
     const search = location.search ? `${location.search}&_summary` : '?_summary';
-    return fetch(`${urlBase || ''}/api/issues${search}`).then(response => {
+    return fetch(`${urlBase || ''}/api/issues${search}`,{credentials: 'same-origin'}).then(response => {
       if (!response.ok) return response.json().then(error => Promise.reject(error));
       return response.json().then(data => ({ IssueReport: data }));
     });
